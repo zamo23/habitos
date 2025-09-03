@@ -9,9 +9,9 @@ export class PlanControl {
         this.planModelo = new PlanModelo();
     }
 
-    async obtenerPlanes(moneda: string = 'PEN'): Promise<PlanListDTO[]> {
+    async obtenerPlanes(token: string | null, moneda: string = 'PEN'): Promise<PlanListDTO[]> {
         try {
-            return await this.planModelo.obtenerPlanes(moneda);
+            return await this.planModelo.obtenerPlanes(token, moneda);
         } catch (error) {
             throw error;
         }

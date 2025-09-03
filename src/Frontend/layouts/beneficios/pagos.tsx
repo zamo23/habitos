@@ -1,9 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, Loader2 } from "lucide-react";
+import { CuponExitoso } from "../../components/CuponExitoso";
 import { useAuth } from "@clerk/clerk-react";
 import { PagoControl } from "../../../Backend/Controlador/PagoControl";
 import { PlanControl } from "../../../Backend/Controlador/PlanControl";
+import { CuponVerificacionResponse } from "../../../Backend/Dto/CuponDTO";
+import { CuponControl } from "../../../Backend/Controlador/CuponControl";
 
 export type PaymentMethod = "yape" | "paypal";
 
@@ -29,7 +32,12 @@ export default function ProcesoDePago() {
   const [saving, setSaving] = useState(false);
   const objectUrlRef = useRef<string | null>(null);
   const [planId, setPlanId] = useState<string | null>(null);
+  const [cuponCodigo, setCuponCodigo] = useState<string>("");
+  const [cuponVerificado, setCuponVerificado] = useState<CuponVerificacionResponse | null>(null);
+  const [aplicandoCupon, setAplicandoCupon] = useState(false);
+  const [mostrarAnimacion, setMostrarAnimacion] = useState(false);
   const planControl = new PlanControl();
+  const cuponControl = new CuponControl();
 
   useEffect(() => {
     const init = async () => {
@@ -51,7 +59,9 @@ export default function ProcesoDePago() {
 
       // Obtener la lista de planes y encontrar el ID correspondiente
       try {
-        const planes = await planControl.obtenerPlanes();
+        const token = await getToken();
+        console.log('Token obtenido:', token ? 'Token presente' : 'Token ausente');
+        const planes = await planControl.obtenerPlanes(token);
         console.log("Planes disponibles:", planes);
         
         const plan = planes.find(p => p.codigo === planInfo.code);
@@ -143,7 +153,9 @@ export default function ProcesoDePago() {
           primer_nombre: senderName.trim(),
           primer_apellido: lastName.trim(),
           id_plan: planId || '',
-          codigo_seguridad: securityCode.trim() || "000"
+          codigo_seguridad: securityCode.trim() || "000",
+          ...(planInfo?.period === 'monthly' && { codigo_cupon: cuponVerificado?.id }),
+          periodo: planInfo?.period || 'monthly'
         });
 
         console.log('Respuesta de verificación:', verificacion);
@@ -253,6 +265,15 @@ export default function ProcesoDePago() {
 
   return (
     <div className="space-y-6">
+      {mostrarAnimacion && (
+        <CuponExitoso
+          esGratis={true}
+          onRedirect="/dashboard"
+          onFinish={() => {
+            setMostrarAnimacion(false);
+          }}
+        />
+      )}
       {/* Header */}
       <div className="flex items-center gap-4">
         <button
@@ -271,6 +292,98 @@ export default function ProcesoDePago() {
           </p>
         </div>
       </div>
+
+      {/* Sección de Cupón - Solo para planes mensuales */}
+      {planInfo?.period === "monthly" && (
+        <section className="rounded-2xl border border-white/10 bg-gray-900/60 p-5">
+          <h2 className="mb-4 text-lg font-semibold">¿Tienes un cupón?</h2>
+          <div className="space-y-4">
+            <div className="flex gap-3">
+            <input
+              type="text"
+              placeholder="Ingresa tu código de cupón"
+              value={cuponCodigo}
+              onChange={(e) => {
+                setCuponCodigo(e.target.value.toUpperCase());
+                setCuponVerificado(null);
+                setError("");
+              }}
+              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white placeholder:text-gray-400"
+            />
+            <button
+              onClick={async () => {
+                if (!cuponCodigo.trim()) {
+                  setError("Ingresa un código de cupón");
+                  return;
+                }
+                if (!planId) {
+                  setError("Error al cargar el plan");
+                  return;
+                }
+                
+                setAplicandoCupon(true);
+                setError("");
+                
+                try {
+                  const token = await getToken();
+                  const verificacion = await cuponControl.verificarCupon(token, {
+                    codigo: cuponCodigo,
+                    id_plan: planId,
+                    ciclo: planInfo?.period === 'annual' ? 'anual' : 'mensual'
+                  });
+                  
+                  setCuponVerificado(verificacion);
+                  
+                  if (verificacion.flujo_sugerido === 'gratis') {
+                    try {
+                      await cuponControl.redimirCupon(token, {
+                        codigo: cuponCodigo,
+                        id_plan: planId,
+                        ciclo: planInfo?.period === 'annual' ? 'anual' : 'mensual'
+                      });
+                      setMostrarAnimacion(true);
+                    } catch (e: any) {
+                      setError(e.message || "Error al redimir el cupón");
+                    }
+                  }
+                } catch (e: any) {
+                  setError(e.message || "Cupón inválido");
+                  setCuponVerificado(null);
+                } finally {
+                  setAplicandoCupon(false);
+                }
+              }}
+              disabled={aplicandoCupon}
+              className="rounded-lg bg-purple-600 px-6 py-2 font-medium text-white hover:bg-purple-500 disabled:opacity-50"
+            >
+              {aplicandoCupon ? "Verificando..." : "Aplicar"}
+            </button>
+          </div>
+
+          {cuponVerificado && (
+            <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-green-400">
+              <p className="font-medium">¡Cupón aplicado!</p>
+              <p className="mt-1 text-sm">
+                {cuponVerificado.es_gratis
+                  ? "Plan gratuito activado"
+                  : `Descuento del ${cuponVerificado.valor}% aplicado`}
+              </p>
+              <p className="mt-2 text-sm">
+                Precio final:{" "}
+                <span className="font-medium">
+                  S/ {(cuponVerificado.precio_final / 100).toFixed(2)}
+                </span>
+                {!cuponVerificado.es_gratis && (
+                  <span className="ml-2 text-gray-400 line-through">
+                    S/ {(cuponVerificado.precio_original / 100).toFixed(2)}
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+      )}
 
       {/* Grid de opciones */}
       <div className="grid gap-6 lg:grid-cols-2">

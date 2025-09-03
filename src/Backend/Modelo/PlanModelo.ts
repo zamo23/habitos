@@ -9,9 +9,9 @@ export class PlanModelo {
         this.planDAO = new PlanDAO();
     }
 
-    async obtenerPlanes(moneda: string = 'PEN'): Promise<PlanListDTO[]> {
+    async obtenerPlanes(token: string | null, moneda: string = 'PEN'): Promise<PlanListDTO[]> {
         try {
-            return await this.planDAO.obtenerPlanes(moneda);
+            return await this.planDAO.obtenerPlanes(token, moneda);
         } catch (error) {
             console.error('Error en PlanModelo.obtenerPlanes:', error);
             throw error;

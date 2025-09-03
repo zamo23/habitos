@@ -4,6 +4,8 @@ export interface VerificacionPagoRequest {
     primer_apellido: string;
     id_plan: string;
     codigo_seguridad?: string;
+    codigo_cupon?: string;
+    periodo: 'monthly' | 'annual';
 }
 
 export interface PlanPagoResponse {

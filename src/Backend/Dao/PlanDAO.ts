@@ -4,9 +4,25 @@ import { PlanListDTO } from '../Dto/PlanListDTO';
 export class PlanDAO {
     private baseUrl: string = import.meta.env.VITE_API;
 
-    async obtenerPlanes(moneda: string = 'PEN'): Promise<PlanListDTO[]> {
+    async obtenerPlanes(token: string | null, moneda: string = 'PEN'): Promise<PlanListDTO[]> {
         try {
-            const response = await fetch(`${this.baseUrl}/plans?moneda=${moneda}`);
+            if (!token) {
+                throw new Error('Token de autenticación requerido');
+            }
+
+            const url = `${this.baseUrl}/plans?moneda=${moneda}`;
+            console.log('Haciendo petición a:', url);
+            console.log('Headers:', {
+                'Authorization': `Bearer ${token ? token.substring(0, 10) + '...' : 'no-token'}`,
+                'Content-Type': 'application/json'
+            });
+            
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
             
             if (!response.ok) {
                 throw new Error(`Error al obtener planes: ${response.statusText}`);
