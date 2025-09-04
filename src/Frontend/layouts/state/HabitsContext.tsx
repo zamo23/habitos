@@ -51,6 +51,7 @@ type Ctx = {
   error: string | null;
   addHabit: (titulo: string, tipo: HabitType) => Promise<{ ok: boolean; reason?: "limit" }>;
   removeHabit: (id: string) => Promise<void>;
+  editHabit: (id: string, titulo: string) => Promise<void>;
   markDone: (id: string, comentario?: string) => Promise<void>;
   markFail: (id: string, comentario?: string) => Promise<void>;
   refetchHabits: () => Promise<void>;
@@ -159,6 +160,18 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const editHabit: Ctx["editHabit"] = async (id, titulo) => {
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('No hay token de autenticación');
+
+      await habitoControl.editarHabito(id, titulo, token);
+      await refetchHabits();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
     <HabitsContext.Provider
       value={{ 
@@ -168,6 +181,7 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         error, 
         addHabit, 
         removeHabit, 
+        editHabit,
         markDone, 
         markFail, 
         refetchHabits

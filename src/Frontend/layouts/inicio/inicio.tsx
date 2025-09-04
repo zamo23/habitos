@@ -9,13 +9,16 @@ import {
   MoreVertical,
   Loader2,
   Lock,
-  Clock
+  Clock,
+  Edit,
 } from "lucide-react";
 import { useHabits, Habit as HabitBase } from "../state/HabitsContext";
-type HabitType = "hacer" | "dejar" | "grupal";
-type Habit = Omit<HabitBase, "tipo"> & { tipo: HabitType; disponibleEn?: string };
 import NuevoRegistroHabito from "../../components/NuevoRegistroHabito";
 import StreakAnimation from "../../components/StreakAnimation";
+import EditarHabitoModal from "../../components/EditarHabitoModal";
+
+type HabitType = "hacer" | "dejar" | "grupal";
+type Habit = Omit<HabitBase, "tipo"> & { tipo: HabitType; disponibleEn?: string };
 
 type TabKey = "hacer" | "dejar" | "grupal";
 
@@ -94,15 +97,18 @@ const HabitCard = ({
   onDone,
   onFail,
   onRequestDelete,
+  onRequestEdit,
 }: {
   habit: Habit;
   onDone: (comentario?: string) => Promise<void>;
   onFail: (comentario?: string) => Promise<void>;
   onRequestDelete: () => Promise<void>;
+  onRequestEdit: (newTitle: string) => Promise<void>;
 }) => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [registroOpen, setRegistroOpen] = React.useState(false);
+  const [editModalOpen, setEditModalOpen] = React.useState(false);
 
   const [showAnimation, setShowAnimation] = React.useState(false);
   const [animationStreak, setAnimationStreak] = React.useState<number>(habit.rachas?.actual || 0);
@@ -115,7 +121,12 @@ const HabitCard = ({
   React.useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
       if (!ref.current) return;
-      if (!ref.current.contains(e.target as Node)) setMenuOpen(false);
+      if (!ref.current.contains(e.target as Node)) {
+        // Añadimos un pequeño retraso para permitir que los clics se registren correctamente
+        setTimeout(() => {
+          setMenuOpen(false);
+        }, 100);
+      }
     };
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
@@ -187,6 +198,18 @@ const HabitCard = ({
                 <Trash2 className="h-4 w-4" />
               )}
               Eliminar
+            </button>
+            <button
+              onClick={() => {
+                console.log('Botón Editar presionado');
+                setMenuOpen(false);
+                setEditModalOpen(true);
+                console.log('Estado del modal después de presionar:', true);
+              }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-blue-300 hover:bg-blue-500/10"
+            >
+              <Edit className="h-4 w-4" />
+              Editar
             </button>
           </div>
         )}
@@ -319,6 +342,20 @@ const HabitCard = ({
           }}
         />
       )}
+
+      <EditarHabitoModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        habitId={habit.id}
+        currentTitle={habit.titulo}
+        onSave={async (newTitle) => {
+          try {
+            await onRequestEdit(newTitle);
+          } catch (error) {
+            console.error('Error al editar hábito:', error);
+          }
+        }}
+      />
     </div>
   );
 };
@@ -398,7 +435,7 @@ const TabsPill = ({
 const Inicio: React.FC = () => {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const { habits, markDone, markFail, removeHabit, isLoading, error } = useHabits();
+  const { habits, markDone, markFail, removeHabit, editHabit, isLoading, error } = useHabits();
 
   const [habitToDelete, setHabitToDelete] = React.useState<Habit | null>(null);
   const initialTab = (params.get("tab") as TabKey) || "hacer";
@@ -504,6 +541,7 @@ const Inicio: React.FC = () => {
                 setHabitToDelete(h);
                 return Promise.resolve();
               }}
+              onRequestEdit={async (newTitle) => await editHabit(h.id, newTitle)}
             />
           ))
         )}

@@ -59,6 +59,24 @@ export class HabitoControl {
         }
     }
 
+    async editarHabito(id: string, titulo: string, token: string): Promise<HabitoRespuestaDTO> {
+        try {
+            // Validaciones básicas
+            if (!token) {
+                throw new Error('Token de autenticación requerido');
+            }
+
+            if (!titulo || titulo.trim() === '') {
+                throw new Error('El título del hábito es requerido');
+            }
+
+            const resultado = await this.habitoDAO.editarHabito(id, titulo, token);
+            return resultado;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async registrarProgreso(habitId: string, registro: RegistroHabito, token: string) {
         try {
             // Validaciones

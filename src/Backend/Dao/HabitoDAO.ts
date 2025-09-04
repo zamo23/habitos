@@ -123,6 +123,36 @@ export class HabitoDAO {
         }
     }
 
+    async editarHabito(habitId: string, titulo: string, token: string): Promise<HabitoRespuestaDTO> {
+        try {
+            const response = await fetch(`${this.apiUrl}/habits/${habitId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ titulo })
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                let errorMessage = 'Error al editar el hábito';
+                if (response.status === 403) {
+                    errorMessage = 'No tienes permisos para editar hábitos. Verifica tu autenticación.';
+                }
+                if (responseData.error?.message) {
+                    errorMessage += `: ${responseData.error.message}`;
+                }
+                throw new Error(errorMessage);
+            }
+
+            return responseData;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async obtenerUsuario(token: string) {
         try {
             const response = await fetch(`${this.apiUrl}/me`, {
