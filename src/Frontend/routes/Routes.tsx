@@ -25,8 +25,8 @@ import { SubscriptionProvider } from "../layouts/state/SubscriptionContext";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import HabitDetailView from "../layouts/inicio/detalles";
 import ProcesoDePago from "../layouts/beneficios/pagos";
-import Facturacion from "../layouts/facturacion/Facturacion";
 import SearchResults from "../pages/SearchResults";
+import Facturacion from "../layouts/facturacion/Facturacion";
 
 
 // ---------- Landing ----------

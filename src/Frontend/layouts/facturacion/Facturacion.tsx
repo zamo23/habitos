@@ -1,9 +1,26 @@
 import React from "react";
-import { CalendarDays, Download, Lock, Info } from "lucide-react";
+import { CalendarDays, Download, Info, Lock } from "lucide-react";
 import { useFacturacion } from "../../hooks/useFacturacion";
+import { generarBoletaHTML } from "./BoletaTemplate";
 
+interface BoletaPago {
+  id: string;
+  fecha_pago: string;
+  moneda: string;
+  monto_centavos: number;
+  plan: string;
+  descripcion?: string;
+  estado: string;
+}
+interface BoletaPlan {
+  codigo: string;
+  max_habitos: number | null;
+  moneda: string;
+  nombre: string;
+  permite_grupos: boolean;
+  precio_centavos: number;
+}
 /* ---------- UI helpers (mismo patrón que SettingsPage) ---------- */
-
 const Card: React.FC<
   React.PropsWithChildren<{
     title: string;
@@ -36,7 +53,6 @@ const Card: React.FC<
           {title}
         </h2>
       </div>
-
       <div className="flex items-center gap-3">
         {actions}
         {comingSoon && (
@@ -47,14 +63,12 @@ const Card: React.FC<
         )}
       </div>
     </header>
-
     <div
       aria-disabled={comingSoon ? true : undefined}
       className={`px-5 pb-4 ${comingSoon ? "pointer-events-none select-none opacity-60" : ""}`}
     >
       {children}
     </div>
-
     {comingSoon && (
       <div className="flex items-start gap-2 rounded-b-2xl border-t border-yellow-400/20 bg-yellow-500/10 px-5 py-3 text-sm text-yellow-200">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />
@@ -116,6 +130,68 @@ const Button = ({
       {children}
     </button>
   );
+};
+
+const handlePrevisualizar = (pago: BoletaPago, plan: BoletaPlan) => {
+  const boletaHTML = generarBoletaHTML({ pago, plan });
+
+  // Crear el blob y abrir en nueva ventana
+  // Usamos text/html para mostrar la boleta como HTML
+  const blob = new Blob([boletaHTML], { type: 'text/html' });
+  const url = window.URL.createObjectURL(blob);
+
+  // Abrir en una nueva ventana
+  const width = Math.min(800, window.innerWidth * 0.9);
+  const height = window.innerHeight * 0.9;
+  const left = (window.innerWidth - width) / 2;
+  const top = (window.innerHeight - height) / 2;
+
+  const ventana = window.open(
+    url,
+    'Vista previa de boleta',
+    `width=${width},height=${height},left=${left},top=${top}`
+  );
+
+  // Agregar botón de descarga en la ventana previsualizada
+  if (ventana) {
+    ventana.onload = () => {
+      const botonDescargar = ventana.document.createElement('button');
+      botonDescargar.innerHTML = 'Descargar Boleta';
+      botonDescargar.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        background-color: #10b981;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+        z-index: 1000;
+      `;
+      botonDescargar.onmouseover = () => {
+        botonDescargar.style.backgroundColor = '#059669';
+      };
+      botonDescargar.onmouseout = () => {
+        botonDescargar.style.backgroundColor = '#10b981';
+      };
+      botonDescargar.onclick = () => {
+        const a = ventana.document.createElement('a');
+        a.href = url;
+        a.download = `boleta-${pago.id}.html`;
+        a.click();
+      };
+      ventana.document.body.appendChild(botonDescargar);
+    };
+  }
+
+  // Limpiar el URL cuando se cierre la ventana
+  setTimeout(() => {
+    window.URL.revokeObjectURL(url);
+  }, 1000);
 };
 
 /* ---------- Página: Facturación ---------- */
@@ -311,79 +387,77 @@ const Facturacion: React.FC = () => {
                   <th className="w-[15%] px-5 py-3 text-right font-medium">Acción</th>
                 </tr>
               </thead>
-            <tbody className="divide-y divide-white/10">
-              {!historial_pagos || historial_pagos.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-5 py-10 text-center text-gray-400"
-                  >
-                    No hay facturas registradas.
-                  </td>
-                </tr>
-              ) : (
-                historial_pagos.map((pago: any) => {
-                  const fecha = new Date(pago.fecha_pago).toLocaleString(
-                    "es-ES",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  );
-                  const estadoClasses =
-                    pago.estado === "confirmado"
-                      ? "bg-green-500/10 text-green-300"
-                      : "bg-yellow-500/10 text-yellow-300";
+              <tbody className="divide-y divide-white/10">
+                {!historial_pagos || historial_pagos.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-5 py-10 text-center text-gray-400"
+                    >
+                      No hay facturas registradas.
+                    </td>
+                  </tr>
+                ) : (
+                  historial_pagos.map((pago: BoletaPago) => {
+                    const fecha = new Date(pago.fecha_pago).toLocaleString(
+                      "es-ES",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    );
+                    const estadoClasses =
+                      pago.estado === "confirmado"
+                        ? "bg-green-500/10 text-green-300"
+                        : "bg-yellow-500/10 text-yellow-300";
 
-                  return (
-                    <tr key={pago.id} className="hover:bg-white/5">
-                      <td className="px-5 py-4 align-top">
-                        <div className="space-y-1">
-                          <div className="font-medium text-white">
-                            {pago.plan}
+                    return (
+                      <tr key={pago.id} className="hover:bg-white/5">
+                        <td className="px-5 py-4 align-top">
+                          <div className="space-y-1">
+                            <div className="font-medium text-white">
+                              {pago.plan}
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              {pago.descripcion}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-400">
-                            {pago.descripcion}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-4 align-top text-sm text-gray-300">
-                        {fecha}
-                      </td>
-                      <td className="px-5 py-4 align-top text-sm font-medium text-white">
-                        {pago.moneda} {(pago.monto_centavos / 100).toFixed(2)}
-                      </td>
-                      <td className="px-5 py-4 align-top">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${estadoClasses}`}
-                        >
-                          {pago.estado.charAt(0).toUpperCase() +
-                            pago.estado.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 align-top text-right">
-                        <div className="flex justify-end">
-                          <Button
-                            intent="ghost"
-                            onClick={() => {
-                              // descarga de PDF aquí
-                            }}
-                            className="whitespace-nowrap"
+                        </td>
+                        <td className="px-5 py-4 align-top text-sm text-gray-300">
+                          {fecha}
+                        </td>
+                        <td className="px-5 py-4 align-top text-sm font-medium text-white">
+                          {pago.moneda} {(pago.monto_centavos / 100).toFixed(2)}
+                        </td>
+                        <td className="px-5 py-4 align-top">
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${estadoClasses}`}
                           >
-                            <Download className="h-4 w-4" />
-                            <span className="hidden sm:inline">PDF</span>
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                            {pago.estado.charAt(0).toUpperCase() +
+                              pago.estado.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 align-top text-right">
+                          <div className="flex justify-end">
+                            <Button
+                              intent="ghost"
+                              onClick={() => handlePrevisualizar(pago, plan)}
+                              className="whitespace-nowrap"
+                            >
+                              <Download className="h-4 w-4" />
+                              <span className="hidden sm:inline">Ver Boleta</span>
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </Card>
@@ -392,3 +466,4 @@ const Facturacion: React.FC = () => {
 };
 
 export default Facturacion;
+
