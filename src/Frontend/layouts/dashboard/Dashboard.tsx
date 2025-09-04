@@ -50,6 +50,22 @@ interface DashboardData {
   };
 }
 
+interface WeeklyProgressData {
+  semana_actual: {
+    fecha_inicio: string;
+    fecha_fin: string;
+    dias: Array<{
+      fecha: string;
+      dia_semana: string;
+      exitos: number;
+      fallos: number;
+      pendientes: number;
+      total: number;
+      es_hoy: boolean;
+    }>;
+  };
+}
+
 /* ---------- Pequeños componentes de UI ---------- */
 
 const StatCard = ({
@@ -118,10 +134,13 @@ const SectionCard: React.FC<React.PropsWithChildren<{ title: string; right?: Rea
 const Dashboard: React.FC = () => {
   const { isLoaded, isSignedIn, getToken } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
+  const [weeklyData, setWeeklyData] = useState<WeeklyProgressData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [weeklyLoading, setWeeklyLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [weeklyError, setWeeklyError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const habitsPerPage = 4; // Número de hábitos por página después del top 3
+  const habitsPerPage = 4; 
 
   if (!isLoaded) {
     return <div className="text-white text-center py-8">Cargando autenticación...</div>;
@@ -159,12 +178,42 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const fetchWeeklyProgressData = async () => {
+    setWeeklyLoading(true);
+    try {
+      const token = await getToken();
+      if (!token) throw new Error('No hay token de autenticación');
+
+      const response = await fetch(`${import.meta.env.VITE_API}/habits/weekly-progress`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const weeklyProgressData = await response.json();
+
+      if (!response.ok) {
+        throw new Error('Error al cargar el progreso semanal');
+      }
+
+      setWeeklyData(weeklyProgressData);
+      setWeeklyError(null);
+    } catch (err) {
+      setWeeklyError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setWeeklyLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchDashboardData();
+    fetchWeeklyProgressData();
   }, []);
 
   const handleRefresh = () => {
     fetchDashboardData();
+    fetchWeeklyProgressData();
   };
 
   const formattedDate = new Date().toLocaleDateString("es-ES", {
@@ -173,43 +222,31 @@ const Dashboard: React.FC = () => {
     year: "numeric",
   });
 
-  // Función para obtener el rango de fechas de la semana actual
-  const getCurrentWeekDates = () => {
-    const today = new Date();
-    const currentDay = today.getDay() || 7; // Domingo será 7 en lugar de 0
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - (currentDay - 1));
-
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-
-    return { monday, sunday };
-  };
-
   useEffect(() => {
-    getCurrentWeekDates();
     // Centrar el día actual en el contenedor de progreso semanal
     const centerCurrentDay = () => {
       const container = document.getElementById('weekProgressContainer');
-      if (container) {
-        const today = new Date();
-        const currentDay = today.getDay() || 7; // Domingo será 7 en lugar de 0
-        const dayWidth = 96; // 6rem = 96px
-        const gap = 8; // 2px gap
-        const scrollPosition = ((currentDay - 1) * (dayWidth + gap)) - ((container.clientWidth - dayWidth) / 2);
-        container.scrollLeft = scrollPosition;
+      if (container && weeklyData) {
+        // Encontrar el índice del día actual
+        const todayIndex = weeklyData.semana_actual.dias.findIndex(dia => dia.es_hoy);
+        if (todayIndex !== -1) {
+          const dayWidth = 104; // 6.5rem = 104px
+          const gap = 12; // 3px gap
+          const scrollPosition = ((todayIndex) * (dayWidth + gap)) - ((container.clientWidth - dayWidth) / 2);
+          container.scrollLeft = scrollPosition;
+        }
       }
     };
 
     // Ejecutar después de que el componente se haya renderizado completamente
     setTimeout(centerCurrentDay, 100);
 
-    // También centrar cuando cambie el tamaño de la ventana
+    // También centrar cuando cambie el tamaño de la ventana o los datos
     window.addEventListener('resize', centerCurrentDay);
     return () => window.removeEventListener('resize', centerCurrentDay);
-  }, [data]);
+  }, [weeklyData]);
 
-  if (loading) {
+  if (loading || weeklyLoading) {
     return (
       <div className="space-y-6 animate-pulse p-6">
         {/* Skeleton Header */}
@@ -360,6 +397,10 @@ const Dashboard: React.FC = () => {
                 <span className="text-xs text-orange-400">En progreso</span>
               </div>
               <div className="flex items-center gap-1.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-red-400"></div>
+                <span className="text-xs text-red-400">Con fallos</span>
+              </div>
+              <div className="flex items-center gap-1.5">
                 <div className="h-2.5 w-2.5 rounded-full bg-gray-400"></div>
                 <span className="text-xs text-gray-400">Pendiente</span>
               </div>
@@ -374,6 +415,10 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-orange-400"></div>
               <span className="text-xs text-orange-400">En progreso</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-400"></div>
+              <span className="text-xs text-red-400">Con fallos</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-gray-400"></div>
@@ -406,33 +451,37 @@ const Dashboard: React.FC = () => {
               document.addEventListener('mouseup', onMouseUp);
             }}
           >
-            <div className="inline-grid grid-rows-[auto,1fr] grid-flow-col auto-cols-[6.5rem] gap-3 px-1">
-              {(() => {
-                // Lunes–Domingo de la semana actual
-                const weekLabels = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-                const today = new Date();
-                const currentDay = today.getDay() || 7; // Domingo = 7
-                const monday = new Date(today);
-                monday.setDate(today.getDate() - (currentDay - 1));
+            {weeklyLoading ? (
+              <div className="flex justify-center w-full py-4">
+                <div className="animate-spin h-6 w-6 border-2 border-emerald-500 rounded-full border-t-transparent"></div>
+              </div>
+            ) : weeklyError ? (
+              <div className="text-center py-4 text-red-400">
+                <p>Error al cargar el progreso semanal</p>
+                <p className="text-sm">{weeklyError}</p>
+              </div>
+            ) : weeklyData ? (
+              <div className="inline-grid grid-rows-[auto,1fr] grid-flow-col auto-cols-[6.5rem] gap-3 px-1">
+                {weeklyData.semana_actual.dias.map((dia, i) => {
+                  const isToday = dia.es_hoy;
+                  const habitosCompletados = dia.exitos;
+                  const habitosFallados = dia.fallos;
+                  const totalHabitos = dia.total;
 
-                return Array.from({ length: 7 }).map((_, i) => {
-                  const date = new Date(monday);
-                  date.setDate(monday.getDate() + i);
-
-                  const isToday = date.toDateString() === today.toDateString();
-                  const habitosCompletados = isToday ? data.resumen.habitos_registrados_hoy : 0;
-                  const totalHabitos = data.resumen.total_habitos;
-                  const porcentaje = isToday ? (habitosCompletados / totalHabitos) * 100 : 0;
-
-                  let estado: "success" | "partial" | "pending" = "pending";
+                  let estado: "success" | "partial" | "pending" | "failed" = "pending";
                   if (habitosCompletados > 0) {
                     estado = habitosCompletados === totalHabitos ? "success" : "partial";
+                  }
+                  if (habitosFallados > 0 && habitosCompletados === 0) {
+                    estado = "failed";
                   }
 
                   return (
                     <React.Fragment key={i}>
                       {/* Fila 1: etiqueta del día */}
-                      <div className="text-center font-medium text-sm text-gray-400 mb-2">{weekLabels[i].slice(0, 3)}</div>
+                      <div className="text-center font-medium text-sm text-gray-400 mb-2">
+                        {dia.dia_semana.slice(0, 3)}
+                      </div>
 
                       {/* Fila 2: tarjeta del día */}
                       <div
@@ -441,7 +490,9 @@ const Dashboard: React.FC = () => {
                             ? "bg-emerald-600/20 border-emerald-500/30 text-white hover:bg-emerald-600/30"
                             : estado === "partial"
                               ? "bg-orange-600/20 border-orange-500/30 text-white hover:bg-orange-600/30"
-                              : "bg-gray-800/60 border-white/10 text-gray-300 hover:bg-gray-800/80"
+                              : estado === "failed"
+                                ? "bg-red-600/20 border-red-500/30 text-white hover:bg-red-600/30"
+                                : "bg-gray-800/60 border-white/10 text-gray-300 hover:bg-gray-800/80"
                           } ${
                             isToday 
                               ? "ring-2 ring-emerald-400 ring-offset-2 ring-offset-gray-900 shadow-lg shadow-emerald-500/20" 
@@ -454,33 +505,36 @@ const Dashboard: React.FC = () => {
                               ? "text-emerald-400"
                               : estado === "partial"
                                 ? "text-orange-400"
-                                : "text-gray-400"
+                                : estado === "failed"
+                                  ? "text-red-400"
+                                  : "text-gray-400"
                           }`}
                         >
-                          {String(date.getDate()).padStart(2, "0")}
+                          {dia.fecha.split('-')[2]}
                         </div>
 
                         <div className={`text-sm font-medium ${
                           isToday ? "text-white" : "text-gray-400"
                         }`}>
-                          {isToday ? `${habitosCompletados}/${totalHabitos}` : "-"}
+                          {habitosCompletados}/{totalHabitos}
                         </div>
 
-                        {isToday && (
-                          <div className="mt-1 text-xs">
-                            {porcentaje === 100 && <span className="text-emerald-400">¡Completado!</span>}
-                            {porcentaje > 0 && porcentaje < 100 && (
-                              <span className="text-orange-400">En progreso</span>
-                            )}
-                            {porcentaje === 0 && <span className="text-gray-400">Pendiente</span>}
-                          </div>
-                        )}
+                        <div className="mt-1 text-xs">
+                          {estado === "success" && <span className="text-emerald-400">¡Completado!</span>}
+                          {estado === "partial" && <span className="text-orange-400">En progreso</span>}
+                          {estado === "failed" && <span className="text-red-400">Con fallos</span>}
+                          {estado === "pending" && <span className="text-gray-400">Pendiente</span>}
+                        </div>
                       </div>
                     </React.Fragment>
                   );
-                });
-              })()}
-            </div>
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-gray-400">
+                No hay datos de progreso semanal disponibles
+              </div>
+            )}
           </div>
         </SectionCard>
 
