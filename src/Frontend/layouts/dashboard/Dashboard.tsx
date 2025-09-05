@@ -238,10 +238,8 @@ const Dashboard: React.FC = () => {
       }
     };
 
-    // Ejecutar después de que el componente se haya renderizado completamente
     setTimeout(centerCurrentDay, 100);
 
-    // También centrar cuando cambie el tamaño de la ventana o los datos
     window.addEventListener('resize', centerCurrentDay);
     return () => window.removeEventListener('resize', centerCurrentDay);
   }, [weeklyData]);

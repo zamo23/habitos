@@ -10,8 +10,11 @@ import {
   Lock,
   Loader2,
   AlertCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
+import { useNotifications } from "../../hooks/useNotifications";
+import { areNotificationsSupported } from "../../../serviceWorkerRegistration";
 
 /* ---------- UI helpers ---------- */
 
@@ -175,10 +178,36 @@ const SettingsPage: React.FC = () => {
     updateSettings 
   } = useSettings();
   const [darkMode, setDarkMode] = React.useState(true);
-  const [notifDaily, setNotifDaily] = React.useState(false);
+  
+  // Integración de notificaciones
+  const isNotificationsSupported = areNotificationsSupported();
+  const {
+    permission: notificationPermission,
+    remindersEnabled,
+    streakAlertsEnabled,
+    toggleReminders,
+    toggleStreakAlerts
+  } = useNotifications();
+  
+  const [notifDaily, setNotifDaily] = React.useState(remindersEnabled);
   const [notifWeekly, setNotifWeekly] = React.useState(false);
-  const [notifStreak, setNotifStreak] = React.useState(false);
+  const [notifStreak, setNotifStreak] = React.useState(streakAlertsEnabled);
   const [notifGroup, setNotifGroup] = React.useState(false);
+  
+  React.useEffect(() => {
+    setNotifDaily(remindersEnabled);
+    setNotifStreak(streakAlertsEnabled);
+  }, [remindersEnabled, streakAlertsEnabled]);
+  
+  const handleDailyRemindersToggle = async (enabled: boolean) => {
+    setNotifDaily(enabled);
+    await toggleReminders(enabled);
+  };
+
+  const handleStreakAlertsToggle = async (enabled: boolean) => {
+    setNotifStreak(enabled);
+    await toggleStreakAlerts(enabled);
+  };
 
   const timezoneOptions = timezones.map(tz => ({
     label: tz.label,
@@ -224,12 +253,10 @@ const SettingsPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Notificaciones — BLOQUEADO */}
+      {/* Notificaciones */}
       <Card
         title="Notificaciones"
         icon={Bell}
-        comingSoon
-        comingSoonNote="Activa avisos diarios, reportes semanales y alertas de racha. Te avisaremos cuando esté disponible."
       >
         <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-white/5">
           <div className="p-4">
@@ -238,7 +265,24 @@ const SettingsPage: React.FC = () => {
                 <Label>Recordatorios Diarios</Label>
                 <Hint>Recibe recordatorios para completar tus hábitos</Hint>
               </div>
-              <Toggle checked={notifDaily} onChange={setNotifDaily} disabled />
+              <Toggle 
+                checked={notifDaily} 
+                onChange={handleDailyRemindersToggle} 
+                disabled={!isNotificationsSupported || notificationPermission === 'denied'} 
+              />
+            </Row>
+          </div>
+          <div className="p-4">
+            <Row>
+              <div>
+                <Label>Alertas de Racha</Label>
+                <Hint>Notificaciones cuando estés cerca de superar tu récord</Hint>
+              </div>
+              <Toggle 
+                checked={notifStreak} 
+                onChange={handleStreakAlertsToggle} 
+                disabled={!isNotificationsSupported || notificationPermission === 'denied'} 
+              />
             </Row>
           </div>
           <div className="p-4">
@@ -246,6 +290,7 @@ const SettingsPage: React.FC = () => {
               <div>
                 <Label>Reportes Semanales</Label>
                 <Hint>Resumen semanal de tu progreso</Hint>
+                <div className="mt-2 text-xs text-blue-400">Próximamente</div>
               </div>
               <Toggle checked={notifWeekly} onChange={setNotifWeekly} disabled />
             </Row>
@@ -253,21 +298,41 @@ const SettingsPage: React.FC = () => {
           <div className="p-4">
             <Row>
               <div>
-                <Label>Alertas de Racha</Label>
-                <Hint>Notificaciones cuando alcances nuevos récords</Hint>
-              </div>
-              <Toggle checked={notifStreak} onChange={setNotifStreak} disabled />
-            </Row>
-          </div>
-          <div className="p-4">
-            <Row>
-              <div>
                 <Label>Actualizaciones de Grupo</Label>
                 <Hint>Actividad en hábitos grupales</Hint>
+                <div className="mt-2 text-xs text-blue-400">Próximamente</div>
               </div>
               <Toggle checked={notifGroup} onChange={setNotifGroup} disabled />
             </Row>
           </div>
+          {!isNotificationsSupported && (
+            <div className="p-4">
+              <div className="flex items-start gap-2 rounded-lg border border-yellow-500/20 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-200">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div>
+                  <div className="font-medium">Notificaciones no soportadas</div>
+                  <div className="text-yellow-100/90">
+                    Tu navegador no soporta notificaciones o no estás usando HTTPS.
+                    Las notificaciones solo funcionan en navegadores modernos y con conexión segura.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {notificationPermission === 'denied' && (
+            <div className="p-4">
+              <div className="flex items-start gap-2 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div>
+                  <div className="font-medium">Permiso denegado</div>
+                  <div className="text-rose-100/90">
+                    Has bloqueado las notificaciones para esta aplicación.
+                    Cambia los permisos en la configuración de tu navegador para recibir notificaciones.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 

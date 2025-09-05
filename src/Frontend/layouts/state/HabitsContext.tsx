@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "@clerk/clerk-react";
 import { HabitoControl } from "../../../Backend/Controlador/HabitoControl";
 import { useSubscription } from "./SubscriptionContext";
+import NotificationService, { NotificationType } from "../../services/NotificationService";
 
 export type HabitType = "hacer" | "dejar";
 
@@ -75,7 +76,7 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     refetchHabits();
-  }, []);
+  }, []); 
 
   const refetchHabits = async () => {
     try {
@@ -85,12 +86,30 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (!token) throw new Error('No hay token de autenticación');
       
       const habitosData = await habitoControl.listarHabitos(token);
-      setHabits(
-        habitosData.map(h => ({
-          ...h,
-          streak: h.rachas?.actual ?? 0 // or provide another logic for streak
-        }))
-      );
+      const mappedHabits = habitosData.map(h => ({
+        ...h,
+        streak: h.rachas?.actual ?? 0
+      }));
+      
+      setHabits(mappedHabits);
+      
+      try {
+        const notificationService = NotificationService.getInstance();
+        if (notificationService.isInitialized() && notificationService.isNotificationEnabled(NotificationType.STREAK)) {
+          mappedHabits.forEach(habit => {
+            if (habit.rachas && habit.rachas.actual > 0 && habit.rachas.mejor > 0) {
+              if (habit.rachas.actual + 1 === habit.rachas.mejor) {
+                notificationService.scheduleStreakNotification(
+                  habit.rachas.actual,
+                  habit.rachas.mejor
+                );
+              }
+            }
+          });
+        }
+      } catch (notifError) {
+        console.warn('No se pudieron programar notificaciones:', notifError);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar los hábitos');
     } finally {
@@ -99,77 +118,57 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const addHabit: Ctx["addHabit"] = async (titulo, tipo) => {
-    try {
-      const token = await getToken();
-      if (!token) {
-        throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
-      }
-      
-      await habitoControl.crearHabito({ titulo, tipo }, token);
-      await refetchHabits();
-      
-      return { ok: true };
-    } catch (error) {
-      throw error;
+    const token = await getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
     }
+    
+    await habitoControl.crearHabito({ titulo, tipo }, token);
+    await refetchHabits();
+    
+    return { ok: true };
   };
 
   const removeHabit: Ctx["removeHabit"] = async (id) => {
-    try {
-      const token = await getToken();
-      if (!token) throw new Error('No hay token de autenticación');
+    const token = await getToken();
+    if (!token) throw new Error('No hay token de autenticación');
 
-      await habitoControl.eliminarHabito(id, token);
-      await refetchHabits();
-    } catch (error) {
-      throw error;
-    }
+    await habitoControl.eliminarHabito(id, token);
+    await refetchHabits();
   };
 
   const markDone: Ctx["markDone"] = async (id, comentario) => {
-    try {
-      const token = await getToken();
-      if (!token) throw new Error('No hay token de autenticación');
+    const token = await getToken();
+    if (!token) throw new Error('No hay token de autenticación');
 
-      const registro = {
-        estado: 'success' as const,
-        comentario
-      };
+    const registro = {
+      estado: 'success' as const,
+      comentario
+    };
 
-      await habitoControl.registrarProgreso(id, registro, token);
-      await refetchHabits();
-    } catch (error) {
-      throw error;
-    }
+    await habitoControl.registrarProgreso(id, registro, token);
+    await refetchHabits();
   };
 
   const markFail: Ctx["markFail"] = async (id, comentario) => {
-    try {
-      const token = await getToken();
-      if (!token) throw new Error('No hay token de autenticación');
+    const token = await getToken();
+    if (!token) throw new Error('No hay token de autenticación');
 
-      const registro = {
-        estado: 'fail' as const,
-        comentario
-      };
+    const registro = {
+      estado: 'fail' as const,
+      comentario
+    };
 
-      await habitoControl.registrarProgreso(id, registro, token);
-      await refetchHabits();
-    } catch (error) {
-      throw error;
-    }
+    await habitoControl.registrarProgreso(id, registro, token);
+    await refetchHabits();
   };
 
   const editHabit: Ctx["editHabit"] = async (id, titulo) => {
-    try {
-      const token = await getToken();
-      if (!token) throw new Error('No hay token de autenticación');
+    const token = await getToken();
+    if (!token) throw new Error('No hay token de autenticación');
 
-      await habitoControl.editarHabito(id, titulo, token);
-      await refetchHabits();
-    } catch (error) {
-      throw error;
-    }
+    await habitoControl.editarHabito(id, titulo, token);
+    await refetchHabits();
   };
 
   return (
