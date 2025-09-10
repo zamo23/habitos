@@ -51,6 +51,7 @@ type Ctx = {
   isLoading: boolean;
   error: string | null;
   addHabit: (titulo: string, tipo: HabitType) => Promise<{ ok: boolean; reason?: "limit" }>;
+  addGroupHabit: (titulo: string, tipo: HabitType, id_grupo: string) => Promise<{ ok: boolean; reason?: "limit" | "not_premium" }>;
   removeHabit: (id: string) => Promise<void>;
   editHabit: (id: string, titulo: string) => Promise<void>;
   markDone: (id: string, comentario?: string) => Promise<void>;
@@ -72,7 +73,7 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const habitoControl = new HabitoControl();
-  useSubscription();
+  const { subscription } = useSubscription();
 
   useEffect(() => {
     refetchHabits();
@@ -86,10 +87,23 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (!token) throw new Error('No hay token de autenticación');
       
       const habitosData = await habitoControl.listarHabitos(token);
-      const mappedHabits = habitosData.map(h => ({
-        ...h,
-        streak: h.rachas?.actual ?? 0
-      }));
+      const mappedHabits = habitosData.map(h => {
+        // Ensure grupo property is properly formatted for group habits
+        if (h.es_grupal && h.grupo) {
+          return {
+            ...h,
+            streak: h.rachas?.actual ?? 0,
+            grupo: {
+              id: h.grupo.id,
+              nombre: h.grupo.nombre
+            }
+          };
+        }
+        return {
+          ...h,
+          streak: h.rachas?.actual ?? 0
+        };
+      });
       
       setHabits(mappedHabits);
       
@@ -124,6 +138,23 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
     
     await habitoControl.crearHabito({ titulo, tipo }, token);
+    await refetchHabits();
+    
+    return { ok: true };
+  };
+
+  const addGroupHabit: Ctx["addGroupHabit"] = async (titulo, tipo, id_grupo) => {
+    const token = await getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación. Por favor, inicia sesión nuevamente.');
+    }
+
+    // Verificar si el usuario tiene una suscripción premium
+    if (!subscription || !subscription.plan.permite_grupos) {
+      return { ok: false, reason: "not_premium" };
+    }
+    
+    await habitoControl.crearHabito({ titulo, tipo, id_grupo }, token);
     await refetchHabits();
     
     return { ok: true };
@@ -179,6 +210,7 @@ export const HabitsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         isLoading, 
         error, 
         addHabit, 
+        addGroupHabit,
         removeHabit, 
         editHabit,
         markDone, 

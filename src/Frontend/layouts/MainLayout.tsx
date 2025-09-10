@@ -28,6 +28,8 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   const getCurrentNavKey = (): NavKey => {
     const path = location.pathname;
+    // Keep "home" selected when viewing group habit details
+    if (path.includes('/dashboard/grupal/habit/')) return 'home';
     if (path.includes('/dashboard')) return 'dashboard';
     if (path.includes('/reports')) return 'reports';
     if (path.includes('/perks')) return 'perks';

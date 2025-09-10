@@ -171,6 +171,9 @@ const Dashboard: React.FC = () => {
 
       setData(dashboardData);
       setError(null);
+      
+      // Clear refresh flag after successful data fetch
+      sessionStorage.removeItem('refreshHabits');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
     } finally {
@@ -207,8 +210,27 @@ const Dashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    // Check if we need to refresh the habits (e.g., after accepting a group invitation)
+    const needsRefresh = sessionStorage.getItem('refreshHabits') === 'true';
+    
     fetchDashboardData();
     fetchWeeklyProgressData();
+    
+    // Set up periodic refresh (every 3 minutes) if the refresh flag is set
+    // This ensures that newly joined group habits will appear even if API takes time to update
+    if (needsRefresh) {
+      const refreshInterval = setInterval(() => {
+        fetchDashboardData();
+        fetchWeeklyProgressData();
+        
+        // After 3 refreshes, clear the interval regardless of result
+        setTimeout(() => {
+          clearInterval(refreshInterval);
+        }, 3 * 60 * 1000); // Stop refreshing after 3 minutes
+      }, 60 * 1000); // Refresh every minute
+      
+      return () => clearInterval(refreshInterval);
+    }
   }, []);
 
   const handleRefresh = () => {
@@ -349,7 +371,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Tarjetas métricas */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4">
         <StatCard
           title="Total Hábitos"
           value={data.resumen.total_habitos.toString()}

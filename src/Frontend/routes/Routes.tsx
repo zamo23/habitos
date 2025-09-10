@@ -20,6 +20,11 @@ import Beneficios from "../layouts/beneficios/beneficios";
 import SettingsPage from "../layouts/ajustes/ajustes";
 
 import NuevaActividadModal from "../components/NuevaActividadModal";
+import NuevoHabitoGrupal from "../components/NuevoHabitoGrupal";
+import JoinGroupInvitation from "../components/JoinGroupInvitation";
+import HabitoGrupalDetalle from "../components/HabitoGrupalDetalle";
+import GrupoDetalle from "../pages/grupos/GrupoDetalle";
+import GruposPage from "../pages/grupos/GruposPage";
 import { HabitsProvider } from "../layouts/state/HabitsContext";
 import { SubscriptionProvider } from "../layouts/state/SubscriptionContext";
 import { Route, Routes, useNavigate } from "react-router-dom";
@@ -153,6 +158,16 @@ const AppRoutes = () => {
           </ProtectedLayout>
         }
       />
+      
+      {/* Nuevo Hábito Grupal (página, no modal) */}
+      <Route
+        path="/home/grupal"
+        element={
+          <ProtectedLayout>
+            <NuevoHabitoGrupal onSuccess={() => {}} />
+          </ProtectedLayout>
+        }
+      />
 
       {/* Otras secciones protegidas */}
       <Route
@@ -196,12 +211,59 @@ const AppRoutes = () => {
         }
       />
 
+      {/* Rutas de grupos */}
+      <Route
+        path="/dashboard/grupal"
+        element={
+          <ProtectedLayout>
+            <GruposPage />
+          </ProtectedLayout>
+        }
+      />
+      <Route
+        path="/dashboard/grupal/:id"
+        element={
+          <ProtectedLayout>
+            <GrupoDetalle />
+          </ProtectedLayout>
+        }
+      />
+      
+      {/* Ruta para detalles de un hábito grupal específico */}
+      <Route
+        path="/dashboard/grupal/habit/:id"
+        element={
+          <ProtectedLayout>
+            <HabitoGrupalDetalle />
+          </ProtectedLayout>
+        }
+      />
+      
+      <Route
+        path="/join-group"
+        element={
+          <ProtectedLayout>
+            <JoinGroupInvitation />
+          </ProtectedLayout>
+        }
+      />
+
       {/* Ruta de pagos */}
       <Route
         path="/perks/payment"
         element={
           <ProtectedLayout>
             <ProcesoDePago />
+          </ProtectedLayout>
+        }
+      />
+
+      {/* Ruta para procesar invitaciones a grupos */}
+      <Route
+        path="/join-group"
+        element={
+          <ProtectedLayout>
+            <JoinGroupInvitation />
           </ProtectedLayout>
         }
       />

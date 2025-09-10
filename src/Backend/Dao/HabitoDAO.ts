@@ -1,9 +1,24 @@
 import { HabitoDTO, HabitoRespuestaDTO } from '../Dto/HabitoDTO';
+import { GrupoInvitacionResponse } from '../Modelo/ApiModelos';
+
+interface Grupo {
+    id: string;
+    nombre: string;
+}
 
 interface HabitoConRachas extends HabitoRespuestaDTO {
     rachas: {
         actual: number;
         mejor: number;
+    };
+    es_grupal: boolean;
+    grupo?: Grupo;
+    registro_hoy?: {
+        completado: boolean;
+        estado: string | null;
+        comentario: string | null;
+        fecha_local_usuario: string;
+        puede_registrar: boolean;
     };
 }
 
@@ -166,6 +181,141 @@ export class HabitoDAO {
             }
 
             return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Obtiene todos los hábitos de un grupo específico
+    async obtenerHabitosGrupales(idGrupo: string, token: string): Promise<HabitoRespuestaDTO[]> {
+        try {
+            const response = await fetch(`${this.apiUrl}/groups/${idGrupo}/habits`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Error al obtener los hábitos grupales');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Obtiene los detalles de un hábito grupal específico
+    async obtenerDetallesHabitoGrupal(idHabito: string, token: string): Promise<any> {
+        try {
+            const response = await fetch(`${this.apiUrl}/groups/habits/${idHabito}/details`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Error al obtener los detalles del hábito grupal');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    // Elimina un miembro de un grupo
+    async eliminarMiembroGrupo(idGrupo: string, idMiembro: string, token: string): Promise<{ ok: boolean }> {
+        try {
+            const response = await fetch(`${this.apiUrl}/groups/${idGrupo}/members/${idMiembro}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Error al eliminar al miembro del grupo');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    // Invitar múltiples usuarios a un grupo por correo electrónico (endpoint batch)
+    async invitarMiembrosGrupo(idGrupo: string, emails: string[], token: string): Promise<GrupoInvitacionResponse> {
+        try {
+            const response = await fetch(`${this.apiUrl}/groups/${idGrupo}/invites/batch`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ correos: emails })
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                throw new Error(responseData.message || 'Error al enviar invitaciones');
+            }
+
+            return responseData;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    // Salir de un grupo (para miembros que no son propietarios ni administradores)
+    async salirDeGrupo(idGrupo: string, token: string): Promise<{ ok: boolean }> {
+        try {
+            const response = await fetch(`${this.apiUrl}/groups/${idGrupo}/leave`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                throw new Error(responseData.message || 'Error al salir del grupo');
+            }
+
+            return responseData;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Cambiar rol de un miembro del grupo
+    async cambiarRolMiembro(idGrupo: string, idMiembro: string, nuevoRol: 'miembro' | 'administrador', token: string): Promise<{ id_clerk: string; rol: string; mensaje: string }> {
+        try {
+            const response = await fetch(`${this.apiUrl}/groups/${idGrupo}/members/${idMiembro}/role`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rol: nuevoRol
+                })
+            });
+
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                throw new Error(responseData.message || 'Error al cambiar el rol del miembro');
+            }
+
+            return responseData;
         } catch (error) {
             throw error;
         }

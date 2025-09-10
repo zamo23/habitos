@@ -11,11 +11,13 @@ import {
   Lock,
   Clock,
   Edit,
+  Users,
 } from "lucide-react";
 import { useHabits, Habit as HabitBase } from "../state/HabitsContext";
 import NuevoRegistroHabito from "../../components/NuevoRegistroHabito";
 import StreakAnimation from "../../components/StreakAnimation";
 import EditarHabitoModal from "../../components/EditarHabitoModal";
+import { useSubscription } from "../state/SubscriptionContext";
 
 type HabitType = "hacer" | "dejar" | "grupal";
 type Habit = Omit<HabitBase, "tipo"> & { tipo: HabitType; disponibleEn?: string };
@@ -149,16 +151,19 @@ const HabitCard = ({
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs ${
-            habit.tipo === "hacer"
-              ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
-              : habit.tipo === "grupal"
+            habit.es_grupal
               ? "bg-blue-500/10 text-blue-300 border border-blue-500/20"
-              : "bg-purple-500/10 text-purple-300 border border-purple-500/20"
+              : habit.tipo === "hacer"
+                ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/20"
+                : "bg-purple-500/10 text-purple-300 border border-purple-500/20"
           }`}>
-            {habit.tipo === "hacer" ? "Hacer" : habit.tipo === "grupal" ? "Grupal" : "Dejar"}
+            {habit.es_grupal ? "Grupal" : habit.tipo === "hacer" ? "Hacer" : "Dejar"}
           </span>
-          {habit.tipo === "grupal" && (
-            <Lock className="h-4 w-4 text-blue-400" />
+          {habit.es_grupal && habit.grupo && (
+            <span className="inline-flex items-center gap-1 text-xs text-blue-300">
+              <Users className="h-3 w-3" />
+              {habit.grupo.nombre}
+            </span>
           )}
         </div>
 
@@ -216,7 +221,9 @@ const HabitCard = ({
       </div>
 
       <button 
-        onClick={() => navigate(`/home/habit/${habit.id}`)}
+        onClick={() => navigate(habit.es_grupal 
+          ? `/dashboard/grupal/habit/${habit.id}` 
+          : `/home/habit/${habit.id}`)}
         className="group block w-full text-left"
       >
         <h3 className="text-lg font-semibold text-white transition-colors group-hover:text-blue-400">
@@ -393,38 +400,29 @@ const EmptyState = ({
 const TabsPill = ({
   active,
   counts,
-  onChange,
-}: {
+  onChange}: {
   active: TabKey;
   counts: Record<TabKey, number>;
   onChange: (tab: TabKey) => void;
+  isPremium: boolean;
 }) => (
   <div className="rounded-2xl border border-white/10 bg-gray-800/60 p-1">
     <div className="grid grid-cols-3 gap-1">
       {(Object.keys(labelMap) as TabKey[]).map((key) => {
-        const isLocked = key === 'grupal' && counts[key] === 0;
         return (
           <button
             key={key}
-            onClick={() => !isLocked && onChange(key)}
+            onClick={() => onChange(key)}
             className={`rounded-xl py-3 text-center font-semibold transition relative
               ${
                 active === key
                   ? "bg-gray-900 text-emerald-300 shadow-inner"
-                  : isLocked 
-                    ? "text-gray-500 cursor-not-allowed"
-                    : "text-gray-300 hover:bg-white/5 hover:text-white"
+                  : "text-gray-300 hover:bg-white/5 hover:text-white"
               }`}
           >
             <div className="inline-flex items-center justify-center gap-2">
               {labelMap[key]} ({counts[key]})
-              {isLocked && <Lock className="h-4 w-4" />}
             </div>
-            {isLocked && (
-              <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-48 bg-gray-800 text-gray-300 text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                Disponible próximamente
-              </div>
-            )}
           </button>
         );
       })}
@@ -436,10 +434,13 @@ const Inicio: React.FC = () => {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const { habits, markDone, markFail, removeHabit, editHabit, isLoading, error } = useHabits();
+  const { subscription } = useSubscription();
 
   const [habitToDelete, setHabitToDelete] = React.useState<Habit | null>(null);
   const initialTab = (params.get("tab") as TabKey) || "hacer";
   const [activeTab, setActiveTab] = React.useState<TabKey>(initialTab);
+  
+  const isPremium = !!subscription?.plan?.permite_grupos;
 
   React.useEffect(() => {
     setParams((p) => {
@@ -453,12 +454,19 @@ const Inicio: React.FC = () => {
   }, [activeTab, setParams]);
 
   const counts: Record<TabKey, number> = {
-    hacer: (habits as Habit[]).filter((h) => h.tipo === "hacer").length,
-    dejar: (habits as Habit[]).filter((h) => h.tipo === "dejar").length,
-    grupal: (habits as Habit[]).filter((h) => h.tipo === "grupal").length,
+    hacer: (habits as Habit[]).filter((h) => h.tipo === "hacer" && !h.es_grupal).length,
+    dejar: (habits as Habit[]).filter((h) => h.tipo === "dejar" && !h.es_grupal).length,
+    grupal: (habits as Habit[]).filter((h) => h.es_grupal).length,
   };
 
-  const filtered = (habits as Habit[]).filter((h) => h.tipo === activeTab);
+  // Filtramos según la tab activa
+  const filtered = (habits as Habit[]).filter((h) => {
+    if (activeTab === 'grupal') {
+      return h.es_grupal;
+    } else {
+      return h.tipo === activeTab && !h.es_grupal;
+    }
+  });
 
   // 👇 Solo mostramos estado de "cargando" si todavía no tenemos datos
   const showInitialLoading = isLoading && habits.length === 0;
@@ -470,7 +478,30 @@ const Inicio: React.FC = () => {
           <h1 className="text-2xl font-semibold text-white sm:text-3xl">
             Mis Hábitos
           </h1>
-          <div className="text-right">
+          <div className="flex gap-2">
+            <button
+              onClick={() => isPremium ? navigate("/home/grupal") : null}
+              disabled={isLoading || !isPremium}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 font-semibold text-white transition-colors relative group ${
+                isPremium 
+                  ? "bg-blue-600 hover:bg-blue-700" 
+                  : "bg-gray-600 cursor-not-allowed opacity-75"
+              } disabled:opacity-50`}
+              title={!isPremium ? "Solo disponible para usuarios premium" : ""}
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Users className="h-5 w-5" />
+              )}
+              Grupal
+              {!isPremium && <Lock className="h-4 w-4" />}
+              {!isPremium && (
+                <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 bg-gray-800 text-gray-300 text-xs py-2 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                  Solo disponible para usuarios premium
+                </div>
+              )}
+            </button>
             <button
               onClick={() => navigate("/home/nueva?from=home")}
               disabled={isLoading}
@@ -504,7 +535,7 @@ const Inicio: React.FC = () => {
         </div>
       </div>
 
-      <TabsPill active={activeTab} counts={counts} onChange={setActiveTab} />
+      <TabsPill active={activeTab} counts={counts} onChange={setActiveTab} isPremium={isPremium} />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {showInitialLoading ? (
