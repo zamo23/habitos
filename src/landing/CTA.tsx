@@ -12,14 +12,13 @@ export const CTA = ({ onRegisterClick }: CTAProps) => {
           ¿Listo para transformar tus hábitos?
         </h2>
         <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-          Únete a los primeros 100 usuarios y obtén acceso Premium completamente gratis. 
-          Tu nueva vida te está esperando.
+          Únete a nuestra comunidad y comienza tu transformación personal. Acceso completo y gratuito para todos, sin limitaciones.
         </p>
         <button
           onClick={onRegisterClick}
           className="bg-white hover:bg-gray-100 text-blue-600 font-semibold px-8 py-4 rounded-lg transition-all transform hover:scale-105 inline-flex items-center text-lg"
         >
-          Comenzar mi transformación
+          Comenzar ahora
           <ArrowRight className="w-5 h-5 ml-2" />
         </button>
       </div>

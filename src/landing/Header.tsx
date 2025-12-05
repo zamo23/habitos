@@ -37,33 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick, onRegisterClick })
   }, [theme]);
 
   return (
-    <>
-      <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 text-white py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center sm:text-left text-sm promotion-card">
-            <span className="font-semibold whitespace-nowrap">🎉 ¡OFERTA ESPECIAL!</span>
-            <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2">
-              <span>Usa el código</span>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText("DESCUENTO100");
-                  const tooltip = document.createElement("div");
-                  tooltip.className = "fixed top-4 right-4 bg-black/75 text-white px-4 py-2 rounded shadow-lg z-50";
-                  tooltip.textContent = "¡Código copiado!";
-                  document.body.appendChild(tooltip);
-                  setTimeout(() => tooltip.remove(), 2000);
-                }}
-                className="font-bold bg-white/20 hover:bg-white/30 px-2 py-0.5 rounded cursor-pointer transition-colors"
-                title="Haz clic para copiar"
-              >
-                DESCUENTO100
-              </button>
-              <span>y obtén 1 mes PREMIUM gratis</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <header className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 z-40">
+    <header className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Barra principal */}
         <div className="flex justify-between items-center py-4">
@@ -86,16 +60,22 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick, onRegisterClick })
               Características
             </a>
             <a
-              href="#pricing"
+              href="#descargas"
               className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
             >
-              Precios
+              Descargas
             </a>
             <a
               href="#about"
               className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
             >
               Acerca de
+            </a>
+            <a
+              href="#faq"
+              className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors"
+            >
+              Preguntas
             </a>
           </nav>
 
@@ -147,11 +127,11 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick, onRegisterClick })
                 Características
               </a>
               <a
-                href="#pricing"
+                href="#descargas"
                 className="text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Precios
+                Descargas
               </a>
               <a
                 href="#about"
@@ -159,6 +139,13 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick, onRegisterClick })
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Acerca de
+              </a>
+              <a
+                href="#faq"
+                className="text-gray-700 dark:text-gray-200 font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Preguntas
               </a>
 
               <div className="pt-4 flex items-center gap-3">
@@ -188,6 +175,5 @@ export const Header: React.FC<HeaderProps> = ({ onLoginClick, onRegisterClick })
         )}
       </div>
     </header>
-    </>
   );
 };

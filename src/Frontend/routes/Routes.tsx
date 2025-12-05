@@ -4,9 +4,10 @@ import { SignedIn, useAuth } from "@clerk/clerk-react";
 import { Header } from "../../landing/Header";
 import { Hero } from "../../landing/Hero";
 import { Features } from "../../landing/Features";
-import { Pricing } from "../../landing/Pricing";
 import { About } from "../../landing/About";
 import { CTA } from "../../landing/CTA";
+import { Descargas } from "../../landing/Descargas";
+import { FAQ } from "../../landing/FAQ";
 import { Footer } from "../../landing/Footer";
 import { Auth } from "../../Frontend/pages/Auth";
 import ErrorView from "../components/Error/ErrorView";
@@ -36,7 +37,6 @@ import Facturacion from "../layouts/facturacion/Facturacion";
 
 // ---------- Landing ----------
 const LandingPage = () => {
-  const [isAnnual, setIsAnnual] = React.useState(true);
   const [showLoginModal, setShowLoginModal] = React.useState(false);
   const [showRegisterModal, setShowRegisterModal] = React.useState(false);
   const { isSignedIn } = useAuth();
@@ -54,8 +54,9 @@ const LandingPage = () => {
       />
       <Hero onRegisterClick={() => setShowRegisterModal(true)} />
       <Features />
-      <Pricing isAnnual={isAnnual} onPeriodChange={setIsAnnual} />
+      <Descargas />
       <About />
+      <FAQ />
       <CTA onRegisterClick={() => setShowRegisterModal(true)} />
       <Footer />
 

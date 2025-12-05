@@ -11,7 +11,7 @@ export const Hero = ({ onRegisterClick }: HeroProps) => {
         <div className="text-center">
           <div className="inline-flex items-center bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Zap className="w-4 h-4 mr-2" />
-            🚀 Premium GRATIS para los primeros 100 usuarios
+            🚀 Premium GRATIS para todos los usuarios
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
