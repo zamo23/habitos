@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
+import { useHabits } from '../../layouts/state/HabitsContext';
 import { GrupoControl } from '../../../Backend/Controlador/GrupoControl';
 import { HabitoControl } from '../../../Backend/Controlador/HabitoControl';
 import { GrupoRespuestaDTO, MiembroGrupoDTO } from '../../../Backend/Dto/GrupoDTO';
@@ -30,6 +31,7 @@ const GrupoDetalle: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getToken, userId } = useAuth();
+  const { refetchHabits } = useHabits();
   const grupoControl = new GrupoControl();
   const habitoControl = new HabitoControl();
 
@@ -96,6 +98,8 @@ const GrupoDetalle: React.FC = () => {
       }
 
       await grupoControl.eliminarGrupo(id, authToken);
+      // Recargar los hábitos para eliminar los hábitos del grupo eliminado
+      await refetchHabits();
       navigate('/dashboard/grupal');
     } catch (error) {
       console.error('Error al eliminar el grupo:', error);

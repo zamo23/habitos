@@ -29,7 +29,7 @@ const MAIN_NAV_ITEMS: { key: NavKey; label: string; icon: React.ElementType }[] 
 
 // Elementos del menú más para móvil
 const MORE_NAV_ITEMS: { key: NavKey; label: string; icon: React.ElementType }[] = [
-  { key: "billing", label: "Facturación", icon: Receipt },
+  // { key: "billing", label: "Facturación", icon: Receipt },
   { key: "settings", label: "Ajustes", icon: Settings },
 ];
 

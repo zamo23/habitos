@@ -453,11 +453,102 @@ const HabitoGrupalDetalle: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-blue-500" />
-          <h2 className="mt-4 text-xl font-medium text-white">Cargando detalles...</h2>
-          <p className="mt-2 text-gray-400">Obteniendo información del hábito grupal</p>
+      <div className="container mx-auto max-w-4xl pb-20 pt-4 space-y-6">
+        {/* Back button and title skeleton */}
+        <div className="mb-6 flex items-center gap-4">
+          <div className="h-9 w-9 rounded-full bg-gray-700 animate-pulse"></div>
+          <div className="h-8 w-96 bg-gray-700 rounded-lg animate-pulse"></div>
+        </div>
+        
+        {/* Group actions skeleton */}
+        <div className="mb-6 flex justify-end">
+          <div className="h-9 w-32 bg-gray-700 rounded-lg animate-pulse"></div>
+        </div>
+
+        {/* Habit header skeleton */}
+        <div className="mb-8 rounded-2xl border border-white/10 bg-gray-900/60 p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-6 w-24 bg-gray-700 rounded-full animate-pulse"></div>
+            <div className="h-6 w-20 bg-gray-700 rounded-full animate-pulse"></div>
+          </div>
+          
+          <div className="h-7 w-64 bg-gray-700 rounded-lg animate-pulse"></div>
+          
+          <div className="flex flex-wrap gap-4">
+            <div className="h-4 w-40 bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="h-4 w-48 bg-gray-700 rounded-lg animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Stats cards skeleton */}
+        <div className="mb-8 grid gap-4 grid-cols-2 md:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-xl border border-white/10 bg-gray-900/60 p-4">
+              <div className="mb-2 h-10 w-10 rounded-full bg-gray-700 animate-pulse"></div>
+              <div className="h-6 w-12 bg-gray-700 rounded-lg animate-pulse mb-2"></div>
+              <div className="h-4 w-20 bg-gray-700 rounded-lg animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+
+        {/* Mi progreso section skeleton */}
+        <div className="mb-8 rounded-2xl border border-white/10 bg-gray-900/60">
+          <div className="border-b border-white/10 p-6 space-y-3">
+            <div className="h-6 w-32 bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="h-4 w-64 bg-gray-700 rounded-lg animate-pulse"></div>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-gray-700 animate-pulse"></div>
+                <div className="space-y-2">
+                  <div className="h-4 w-32 bg-gray-700 rounded-lg animate-pulse"></div>
+                  <div className="h-3 w-48 bg-gray-700 rounded-lg animate-pulse"></div>
+                </div>
+              </div>
+              <div className="h-9 w-32 bg-gray-700 rounded-lg animate-pulse"></div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="rounded-lg border border-white/10 bg-white/5 p-3">
+                  <div className="h-3 w-16 bg-gray-700 rounded-lg animate-pulse mb-2"></div>
+                  <div className="h-5 w-12 bg-gray-700 rounded-lg animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Members progress skeleton */}
+        <div className="rounded-2xl border border-white/10 bg-gray-900/60">
+          <div className="border-b border-white/10 p-6 space-y-3">
+            <div className="h-6 w-48 bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="h-4 w-80 bg-gray-700 rounded-lg animate-pulse"></div>
+          </div>
+          
+          <div className="divide-y divide-white/10">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="p-6 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-gray-700 animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-gray-700 rounded-lg animate-pulse"></div>
+                      <div className="h-3 w-40 bg-gray-700 rounded-lg animate-pulse"></div>
+                    </div>
+                  </div>
+                  <div className="h-8 w-24 bg-gray-700 rounded-lg animate-pulse"></div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {[...Array(4)].map((_, j) => (
+                    <div key={j} className="h-8 bg-gray-700 rounded-lg animate-pulse"></div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -1020,29 +1111,47 @@ const HabitoGrupalDetalle: React.FC = () => {
 
               {inviteSuccess ? (
                 <div className="space-y-4">
-                  <div className="rounded-md bg-green-900/30 p-4 text-sm text-green-400">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle className="h-5 w-5" />
-                      <span className="font-medium">¡Invitaciones enviadas con éxito!</span>
+                  {invitationResult?.total_exitosas === 0 && invitationResult?.errores && invitationResult.errores.length > 0 ? (
+                    // Si no hay invitaciones exitosas pero hay errores
+                    <div className="rounded-md bg-red-900/30 p-4 text-sm text-red-400">
+                      <div className="flex items-center gap-2 mb-2">
+                        <AlertCircle className="h-5 w-5" />
+                        <span className="font-medium">No se enviaron invitaciones</span>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    // Si hay al menos algunas invitaciones exitosas
+                    <div className="rounded-md bg-green-900/30 p-4 text-sm text-green-400">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle className="h-5 w-5" />
+                        <span className="font-medium">¡Invitaciones enviadas con éxito!</span>
+                      </div>
+                    </div>
+                  )}
 
                   {invitationResult && (
                     <div className="space-y-3 rounded-md border border-white/10 p-4 text-sm">
-                      <p className="text-gray-300">
-                        Se enviaron <span className="font-medium text-green-400">{invitationResult.total_exitosas}</span> invitaciones.
-                      </p>
+                      {invitationResult.total_exitosas > 0 && (
+                        <p className="text-gray-300">
+                          Se enviaron <span className="font-medium text-green-400">{invitationResult.total_exitosas}</span> invitaciones.
+                        </p>
+                      )}
 
                       {invitationResult.errores && invitationResult.errores.length > 0 && (
                         <div className="space-y-2">
-                          <p className="text-gray-300">
-                            Algunas invitaciones no pudieron enviarse:
+                          <p className="text-gray-300 font-medium">
+                            {invitationResult.total_exitosas === 0 ? 'Motivos:' : 'Algunas invitaciones no pudieron enviarse:'}
                           </p>
                           <div className="max-h-40 overflow-auto rounded-lg border border-white/10 bg-gray-800 p-2">
                             {invitationResult.errores.map((fallo, index) => (
-                              <div key={index} className="flex items-center justify-between border-b border-white/5 py-2 last:border-0">
+                              <div key={index} className="border-b border-white/5 py-2 last:border-0">
                                 <span className="text-red-400">{fallo.correo}</span>
-                                <span className="text-gray-400">{fallo.error}</span>
+                                <p className="text-xs text-gray-400 mt-1">
+                                  {fallo.error === 'El usuario no está registrado en la plataforma' 
+                                    ? '⚠️ El usuario debe estar registrado en la plataforma antes de ser invitado'
+                                    : fallo.error
+                                  }
+                                </p>
                               </div>
                             ))}
                           </div>
@@ -1222,27 +1331,43 @@ const HabitoGrupalDetalle: React.FC = () => {
             
             {inviteSuccess ? (
               <div className="mb-4 space-y-3">
-                <div className="rounded-md bg-green-900/30 p-3 text-sm text-green-400 flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5" />
-                  <span>¡Invitaciones enviadas con éxito!</span>
-                </div>
+                {invitationResult?.total_exitosas === 0 && invitationResult?.errores && invitationResult.errores.length > 0 ? (
+                  // Si no hay invitaciones exitosas pero hay errores
+                  <div className="rounded-md bg-red-900/30 p-3 text-sm text-red-400 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5" />
+                    <span>No se enviaron invitaciones</span>
+                  </div>
+                ) : (
+                  // Si hay al menos algunas invitaciones exitosas
+                  <div className="rounded-md bg-green-900/30 p-3 text-sm text-green-400 flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    <span>¡Invitaciones enviadas con éxito!</span>
+                  </div>
+                )}
                 
                 {invitationResult && (
                   <div className="space-y-3 rounded-md border border-white/10 p-3 text-sm">
-                    <p className="text-gray-300">
-                      Se enviaron <span className="font-medium text-green-400">{invitationResult.total_exitosas}</span> invitaciones.
-                    </p>
+                    {invitationResult.total_exitosas > 0 && (
+                      <p className="text-gray-300">
+                        Se enviaron <span className="font-medium text-green-400">{invitationResult.total_exitosas}</span> invitaciones.
+                      </p>
+                    )}
                     
                     {invitationResult.errores && invitationResult.errores.length > 0 && (
                       <div className="space-y-2">
-                        <p className="text-gray-300">
-                          Algunas invitaciones no pudieron enviarse:
+                        <p className="text-gray-300 font-medium">
+                          {invitationResult.total_exitosas === 0 ? 'Motivos:' : 'Algunas invitaciones no pudieron enviarse:'}
                         </p>
                         <div className="max-h-40 overflow-auto rounded-lg border border-white/10 bg-gray-800 p-2">
                           {invitationResult.errores.map((fallo, index) => (
-                            <div key={index} className="flex items-center justify-between border-b border-white/5 py-2 last:border-0">
+                            <div key={index} className="border-b border-white/5 py-2 last:border-0">
                               <span className="text-red-400">{fallo.correo}</span>
-                              <span className="text-xs text-gray-400">{fallo.error}</span>
+                              <p className="text-xs text-gray-400 mt-1">
+                                {fallo.error === 'El usuario no está registrado en la plataforma' 
+                                  ? '⚠️ El usuario debe estar registrado en la plataforma antes de ser invitado'
+                                  : fallo.error
+                                }
+                              </p>
                             </div>
                           ))}
                         </div>

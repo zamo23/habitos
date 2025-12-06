@@ -37,7 +37,7 @@ const NuevoHabitoGrupal: React.FC<NuevoHabitoGrupalProps> = ({
   const [nuevoNombreGrupo, setNuevoNombreGrupo] = React.useState('');
   const [nuevaDescripcionGrupo, setNuevaDescripcionGrupo] = React.useState('');
   
-  const { addGroupHabit } = useHabits();
+  const { addGroupHabit, refetchHabits } = useHabits();
   const { getToken } = useAuth();
   const grupoControl = new GrupoControl();
 
@@ -310,7 +310,7 @@ const NuevoHabitoGrupal: React.FC<NuevoHabitoGrupalProps> = ({
       // Actualizar la lista de grupos
       setGrupos(prev => prev.map(g => 
         g.id === grupoEditar.id 
-          ? { ...g, nombre: nuevoNombreGrupo } 
+          ? { ...g, nombre: nuevoNombreGrupo, descripcion: nuevaDescripcionGrupo } 
           : g
       ));
       
@@ -349,6 +349,9 @@ const NuevoHabitoGrupal: React.FC<NuevoHabitoGrupalProps> = ({
       if (grupoSeleccionado === grupoEliminar.id) {
         setGrupoSeleccionado('');
       }
+      
+      // Recargar los hábitos para eliminar los hábitos del grupo eliminado
+      await refetchHabits();
       
       // Cerrar el modal de confirmación
       setGrupoEliminar(null);
