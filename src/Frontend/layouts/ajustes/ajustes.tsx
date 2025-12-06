@@ -253,10 +253,12 @@ const SettingsPage: React.FC = () => {
         </div>
       </Card>
 
-      {/* Notificaciones */}
+      {/* Notificaciones — BLOQUEADO */}
       <Card
         title="Notificaciones"
         icon={Bell}
+        comingSoon
+        comingSoonNote="Pronto podrás configurar recordatorios diarios, alertas de racha, reportes semanales y actualizaciones de grupo."
       >
         <div className="divide-y divide-white/10 rounded-xl border border-white/10 bg-white/5">
           <div className="p-4">
@@ -268,7 +270,7 @@ const SettingsPage: React.FC = () => {
               <Toggle 
                 checked={notifDaily} 
                 onChange={handleDailyRemindersToggle} 
-                disabled={!isNotificationsSupported || notificationPermission === 'denied'} 
+                disabled 
               />
             </Row>
           </div>
@@ -281,7 +283,7 @@ const SettingsPage: React.FC = () => {
               <Toggle 
                 checked={notifStreak} 
                 onChange={handleStreakAlertsToggle} 
-                disabled={!isNotificationsSupported || notificationPermission === 'denied'} 
+                disabled 
               />
             </Row>
           </div>
@@ -290,7 +292,6 @@ const SettingsPage: React.FC = () => {
               <div>
                 <Label>Reportes Semanales</Label>
                 <Hint>Resumen semanal de tu progreso</Hint>
-                <div className="mt-2 text-xs text-blue-400">Próximamente</div>
               </div>
               <Toggle checked={notifWeekly} onChange={setNotifWeekly} disabled />
             </Row>
@@ -300,39 +301,10 @@ const SettingsPage: React.FC = () => {
               <div>
                 <Label>Actualizaciones de Grupo</Label>
                 <Hint>Actividad en hábitos grupales</Hint>
-                <div className="mt-2 text-xs text-blue-400">Próximamente</div>
               </div>
               <Toggle checked={notifGroup} onChange={setNotifGroup} disabled />
             </Row>
           </div>
-          {!isNotificationsSupported && (
-            <div className="p-4">
-              <div className="flex items-start gap-2 rounded-lg border border-yellow-500/20 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-200">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-                <div>
-                  <div className="font-medium">Notificaciones no soportadas</div>
-                  <div className="text-yellow-100/90">
-                    Tu navegador no soporta notificaciones o no estás usando HTTPS.
-                    Las notificaciones solo funcionan en navegadores modernos y con conexión segura.
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          {notificationPermission === 'denied' && (
-            <div className="p-4">
-              <div className="flex items-start gap-2 rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                <div>
-                  <div className="font-medium">Permiso denegado</div>
-                  <div className="text-rose-100/90">
-                    Has bloqueado las notificaciones para esta aplicación.
-                    Cambia los permisos en la configuración de tu navegador para recibir notificaciones.
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </Card>
 
