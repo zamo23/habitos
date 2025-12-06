@@ -11,11 +11,6 @@ export class PlanDAO {
             }
 
             const url = `${this.baseUrl}/plans?moneda=${moneda}`;
-            console.log('Haciendo petición a:', url);
-            console.log('Headers:', {
-                'Authorization': `Bearer ${token ? token.substring(0, 10) + '...' : 'no-token'}`,
-                'Content-Type': 'application/json'
-            });
             
             const response = await fetch(url, {
                 headers: {

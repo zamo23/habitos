@@ -111,7 +111,6 @@ const GrupoDetalle: React.FC = () => {
   const handleNuevoHabito = () => {
     // Aquí iría la lógica para abrir un modal o navegar a una página para crear un nuevo hábito grupal
     // Por ejemplo: navigate(`/crear-habito-grupal/${id}`);
-    console.log('Crear nuevo hábito grupal');
   };
 
   // Actualiza la lista de miembros después de invitar/eliminar

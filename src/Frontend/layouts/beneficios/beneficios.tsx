@@ -5,7 +5,6 @@ import {
   Gift,
   Crown,
   Star,
-  BadgePercent,
   Info,
 } from "lucide-react";
 import { FeatureDisplay, type Feature } from "./FeatureDisplay";
@@ -64,19 +63,10 @@ const PLAN_UI_CONFIG: Record<string, PlanUIConfig> = {
     features: [
       "Seguimiento ilimitado de hábitos",
       "Todo lo de Standard",
-      {
-        text: "Hábitos grupales",
-        badge: "Disponible pronto"
-      },
-      {
-        text: "Panel de administración",
-        badge: "Disponible pronto"
-      },
+      "Hábitos grupales",
+      "Panel de administración",
       "Soporte 24/7",
-      {
-        text: "Coaching mensual",
-        badge: "Disponible pronto"
-      },
+      "Coaching IA",
     ],
   },
 };
@@ -114,7 +104,7 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
 
 const Beneficios: React.FC = () => {
   const navigate = useNavigate();
-  const [period, setPeriod] = useState<Period>("monthly");
+  const [period] = useState<Period>("monthly");
   const [currentSuscripcion, setCurrentSuscripcion] = useState<SuscripcionDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -129,7 +119,6 @@ const Beneficios: React.FC = () => {
         setLoading(true);
         const token = await getToken();
         const suscripcion = await planControl.obtenerSuscripcionActual(token);
-        console.log('Suscripción cargada:', suscripcion);
         setCurrentSuscripcion(suscripcion);
         setError(null);
       } catch (err) {
@@ -264,8 +253,6 @@ const Beneficios: React.FC = () => {
       period
     };
     
-    console.log('Navegando a pagos con info:', planInfo);
-    
     // Usar replace: false para mantener la historia de navegación
     navigate("/perks/payment", { 
       state: planInfo,
@@ -273,12 +260,6 @@ const Beneficios: React.FC = () => {
     });
   };
 
-  const discountNote =
-    period === "annual" ? (
-      <span className="inline-flex items-center gap-1 text-emerald-300 text-xs font-semibold">
-        <BadgePercent className="h-4 w-4" /> 17% de descuento
-      </span>
-    ) : null;
 
   return (
     <div className="space-y-8">
@@ -289,37 +270,7 @@ const Beneficios: React.FC = () => {
           <h1 className="text-3xl font-extrabold tracking-tight">Beneficios</h1>
         </div>
 
-        {/* Toggle Mensual/Anual */}
-        <div className="flex items-center gap-2 text-sm">
-          <button
-            onClick={() => setPeriod("monthly")}
-            className={`rounded-full px-2 py-1 ${
-              period === "monthly"
-                ? "bg-white/10 text-white"
-                : "text-gray-400 hover:text-gray-200"
-            }`}
-          >
-            Mensual
-          </button>
-          <div className="relative h-5 w-9 rounded-full bg-gray-700">
-            <div
-              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition ${
-                period === "annual" ? "right-0.5" : "left-0.5"
-              }`}
-            />
-          </div>
-          <button
-            onClick={() => setPeriod("annual")}
-            className={`rounded-full px-2 py-1 ${
-              period === "annual"
-                ? "bg-emerald-600/20 text-emerald-300"
-                : "text-gray-400 hover:text-gray-200"
-            }`}
-            title="Paga anual y ahorra"
-          >
-            Anual {discountNote}
-          </button>
-        </div>
+  
       </div>
 
       {/* Tu plan actual */}

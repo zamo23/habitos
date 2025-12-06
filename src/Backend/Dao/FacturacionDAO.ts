@@ -35,7 +35,6 @@ export class FacturacionDAO {
 
     constructor() {
         this.apiUrl = API_URL.replace(/\/$/, '');
-        console.log('API URL:', this.apiUrl); 
     }
 
     async obtenerFacturacionActual(token: string): Promise<FacturacionResponse> {
@@ -44,7 +43,6 @@ export class FacturacionDAO {
                 throw new Error('No se proporcionó token de autenticación');
             }
 
-            console.log('Realizando petición a:', `${this.apiUrl}/suscripcion/actual`); // Para depuración
             const response = await fetch(`${this.apiUrl}/suscripcion/actual`, {
                 headers: {
                     'Accept': 'application/json',

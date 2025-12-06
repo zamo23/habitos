@@ -20,7 +20,6 @@ const EditarHabitoModal: React.FC<EditarHabitoModalProps> = ({
 
   // Log cuando cambia la propiedad isOpen
   useEffect(() => {
-    console.log('Modal estado isOpen:', isOpen);
     if (isOpen) {
       setTitle(currentTitle);
     }

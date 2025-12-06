@@ -220,7 +220,6 @@ class NotificationService {
           },
         });
         
-        console.log(`Notificación programada para ${format(reminderTime, 'HH:mm')} (${hoursBeforeEnd}h antes del cierre)`);
       }
     }
   }
@@ -271,7 +270,6 @@ class NotificationService {
         },
       });
       
-      console.log(`Notificación de racha programada para ${format(notificationTime, 'HH:mm')}`);
     }
   }
 
@@ -310,7 +308,6 @@ class NotificationService {
 
     try {
       await idbHelper.saveNotificationSettings(settings);
-      console.log('Configuración de notificaciones guardada en IndexedDB');
     } catch (error) {
       console.warn('Error al guardar en IndexedDB, usando localStorage como fallback:', error);
     }
@@ -327,7 +324,6 @@ class NotificationService {
         this.timezone = settings.timezone;
         this.endHour = settings.endHour;
         this.configs = settings.configs;
-        console.log('Configuración de notificaciones cargada desde IndexedDB');
         return;
       }
     } catch (error) {
@@ -341,7 +337,6 @@ class NotificationService {
         this.timezone = settings.timezone;
         this.endHour = settings.endHour;
         this.configs = settings.configs;
-        console.log('Configuración de notificaciones cargada desde localStorage');
       } catch (error) {
         console.error('Error al parsear configuración de notificaciones:', error);
       }

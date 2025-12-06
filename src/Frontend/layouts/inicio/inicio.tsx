@@ -206,10 +206,8 @@ const HabitCard = ({
             </button>
             <button
               onClick={() => {
-                console.log('Botón Editar presionado');
                 setMenuOpen(false);
                 setEditModalOpen(true);
-                console.log('Estado del modal después de presionar:', true);
               }}
               className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-blue-300 hover:bg-blue-500/10"
             >

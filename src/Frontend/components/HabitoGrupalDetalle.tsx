@@ -274,11 +274,8 @@ const HabitoGrupalDetalle: React.FC = () => {
       const grupoControl = new GrupoControl();
       const invitacionesData = await grupoControl.obtenerInvitaciones(habito.grupo.id, token);
       
-      console.log('📋 Invitaciones obtenidas:', invitacionesData);
-
       // Filtrar solo invitaciones pendientes
       const invitacionesPendientes = invitacionesData.filter((inv: any) => inv.estado === 'pendiente');
-      console.log('📋 Invitaciones pendientes:', invitacionesPendientes);
 
       // Mapear a InvitacionPendiente
       const invitacionesPendientesMapped: InvitacionPendiente[] = invitacionesPendientes.map((inv: any) => ({
@@ -936,13 +933,6 @@ const HabitoGrupalDetalle: React.FC = () => {
                     // - Miembros no pueden gestionar a nadie
                     const canManage = (isOwner && isNotCurrentUser) || 
                                      (isAdmin && !isMemberOwner && isNotCurrentUser);
-                    
-                    console.log(`🔍 Debug permissions for ${miembro.nombre || 'Usuario'}:`);
-                    console.log(`   - Current user role: "${habito.mi_rol_en_grupo}" (isOwner: ${isOwner}, isAdmin: ${isAdmin})`);
-                    console.log(`   - Member role: "${miembro.rol}" (isMemberOwner: ${isMemberOwner})`);
-                    console.log(`   - User IDs: current="${userId}", member="${miembro.id_clerk}" (isNotCurrentUser: ${isNotCurrentUser})`);
-                    console.log(`   - Can manage: ${canManage}`);
-                    console.log(`   - Final result: ${canManage ? 'SHOW BUTTONS' : 'HIDE BUTTONS'}`);
                     
                     return canManage;
                   })() && (

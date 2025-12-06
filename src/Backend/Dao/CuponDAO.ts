@@ -12,13 +12,7 @@ export class CuponDAO {
         }
 
         try {
-            console.log('Verificando cupón:', {
-                token: token ? `${token.substring(0, 10)}...` : 'no-token',
-                datos
-            });
-            
             const url = `${this.baseUrl}/cupones/verificar`;
-            console.log('URL:', url);
             
             const response = await fetch(url, {
                 method: 'POST',

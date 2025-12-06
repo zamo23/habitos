@@ -13,8 +13,6 @@ const GrupoMiembrosManager: React.FC<GrupoMiembrosManagerProps> = ({ grupoId, on
   const { getToken, userId } = useAuth();
   const grupoControl = new GrupoControl();
   
-  console.log('🎯 GrupoMiembrosManager component rendered for group:', grupoId);
-  
   const [miembros, setMiembros] = useState<MiembroGrupoDTO[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,10 +25,8 @@ const GrupoMiembrosManager: React.FC<GrupoMiembrosManagerProps> = ({ grupoId, on
 
   // Get all members
   useEffect(() => {
-    console.log('🔄 useEffect triggered in GrupoMiembrosManager for group:', grupoId);
     const cargarMiembros = async () => {
       if (!grupoId) {
-        console.log('❌ No groupId provided');
         return;
       }
       
@@ -45,15 +41,11 @@ const GrupoMiembrosManager: React.FC<GrupoMiembrosManagerProps> = ({ grupoId, on
 
         const data = await grupoControl.obtenerMiembrosGrupo(grupoId, authToken);
         setMiembros(data);
-        console.log('✅ Members loaded successfully:', data.length, 'members');
         
         // Find current user's role
         const currentUserMember = data.find(miembro => miembro.id_usuario === userId);
         if (currentUserMember) {
           setUserRole(currentUserMember.rol);
-          console.log(`👤 Current user role set to: "${currentUserMember.rol}" for user ID: ${userId}`);
-        } else {
-          console.log(`⚠️  Current user (ID: ${userId}) not found in members list`);
         }
       } catch (error) {
         console.error('Error al cargar miembros del grupo:', error);
@@ -89,15 +81,7 @@ const GrupoMiembrosManager: React.FC<GrupoMiembrosManagerProps> = ({ grupoId, on
         rol: inviteRole
       };
 
-      console.log('🚀 Enviando invitación desde GrupoMiembrosManager:', {
-        grupoId,
-        invitacionData,
-        token: authToken ? 'Token presente' : 'Sin token'
-      });
-
       const response = await grupoControl.invitarUsuario(grupoId, invitacionData, authToken);
-
-      console.log('✅ Respuesta de invitación desde GrupoMiembrosManager:', response);
 
       setInviteSuccess(`Invitación enviada a ${inviteEmail} con éxito`);
       setInviteEmail('');
@@ -276,13 +260,6 @@ const GrupoMiembrosManager: React.FC<GrupoMiembrosManagerProps> = ({ grupoId, on
                   
                   const canRemove = (isOwner && !isOwnerMember && isNotCurrentUser) || 
                                    (isAdmin && isMember && isNotCurrentUser);
-                  
-                  console.log(`🔍 Debug permissions for ${miembro.nombre_usuario}:`);
-                  console.log(`   - Current user role: "${userRole}" (isOwner: ${isOwner}, isAdmin: ${isAdmin})`);
-                  console.log(`   - Member role: "${miembro.rol}" (isMember: ${isMember}, isOwnerMember: ${isOwnerMember})`);
-                  console.log(`   - User IDs: current="${userId}", member="${miembro.id_usuario}" (isNotCurrentUser: ${isNotCurrentUser})`);
-                  console.log(`   - Can remove: ${canRemove}`);
-                  console.log(`   - Final result: ${canRemove ? 'SHOW BUTTON' : 'HIDE BUTTON'}`);
                   
                   return canRemove;
                 })() && (

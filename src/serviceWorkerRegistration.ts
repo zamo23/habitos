@@ -8,10 +8,8 @@ export function registerServiceWorker() {
         
         // Si hay registros existentes, intentamos actualizarlos
         if (registrations.length > 0) {
-          console.log('Actualizando Service Workers existentes...');
           for (const registration of registrations) {
             await registration.update();
-            console.log('Service Worker actualizado:', registration.scope);
           }
         }
         
@@ -19,8 +17,6 @@ export function registerServiceWorker() {
         const registration = await navigator.serviceWorker.register('/sw.js', {
           updateViaCache: 'none' // No usar caché para el service worker
         });
-        
-        console.log('Service Worker registrado con éxito:', registration.scope);
         
         // Forzar la activación del service worker
         if (registration.waiting) {
@@ -33,7 +29,6 @@ export function registerServiceWorker() {
     
     // Escuchar cambios en el service worker
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('Service Worker controller ha cambiado');
     });
   }
 }

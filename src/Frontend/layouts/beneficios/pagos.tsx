@@ -43,30 +43,22 @@ export default function ProcesoDePago() {
     const init = async () => {
       // Verificar si tenemos la información del plan en el estado de navegación
       if (!location.state) {
-        console.log("No hay estado en la ubicación");
         navigate("/perks", { replace: true });
         return;
       }
 
       if (!planInfo) {
-        console.log("No se pudo extraer la información del plan del estado");
         navigate("/perks", { replace: true });
         return;
       }
 
-      console.log("Estado de ubicación:", location.state);
-      console.log("Información del plan:", planInfo);
-
       // Obtener la lista de planes y encontrar el ID correspondiente
       try {
         const token = await getToken();
-        console.log('Token obtenido:', token ? 'Token presente' : 'Token ausente');
         const planes = await planControl.obtenerPlanes(token);
-        console.log("Planes disponibles:", planes);
         
         const plan = planes.find(p => p.codigo === planInfo.code);
         if (plan) {
-          console.log("Plan encontrado:", plan);
           setPlanId(plan.id);
         } else {
           console.error("Plan no encontrado para código:", planInfo.code);
@@ -142,14 +134,7 @@ export default function ProcesoDePago() {
             return;
           }
           
-          console.log('Iniciando verificación de pago...');        console.log('Enviando datos de verificación:', {
-          primer_nombre: senderName.trim(),
-          primer_apellido: lastName.trim(),
-          id_plan: planId,
-          codigo_seguridad: securityCode.trim() || "000"
-        });
-
-        const verificacion = await pagoControl.verificarPago(token, {
+          const verificacion = await pagoControl.verificarPago(token, {
           primer_nombre: senderName.trim(),
           primer_apellido: lastName.trim(),
           id_plan: planId || '',
@@ -158,11 +143,7 @@ export default function ProcesoDePago() {
           periodo: planInfo?.period || 'monthly'
         });
 
-        console.log('Respuesta de verificación:', verificacion);
-
         if (!verificacion.aprobado) {
-          console.log('Pago no aprobado. Detalles:', verificacion);
-          
           let errorMessage = '';
           
           // Caso: Monto incorrecto
@@ -190,8 +171,6 @@ export default function ProcesoDePago() {
           setError(errorMessage);
           return;
         }
-
-        console.log('Pago aprobado:', verificacion);
 
         // Actualizar el estado de la suscripción
         // El pago fue exitoso

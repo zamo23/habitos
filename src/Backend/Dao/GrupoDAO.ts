@@ -133,16 +133,6 @@ export class GrupoDAO {
             const requestBody = invitacion;
             const requestUrl = `${this.apiUrl}/groups/${id_grupo}/invites`;
 
-            console.log('📡 DAO - Enviando invitación individual:', {
-                url: requestUrl,
-                method: 'POST',
-                body: requestBody,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token ? 'Token presente' : 'Sin token'}`
-                }
-            });
-
             const response = await fetch(requestUrl, {
                 method: 'POST',
                 headers: {
@@ -152,12 +142,6 @@ export class GrupoDAO {
                 body: JSON.stringify(requestBody)
             });
 
-            console.log('📡 DAO - Respuesta HTTP invitación individual:', {
-                status: response.status,
-                statusText: response.statusText,
-                headers: Object.fromEntries(response.headers.entries())
-            });
-
             if (!response.ok) {
                 const error = await response.json();
                 console.error('❌ DAO - Error en respuesta de invitación individual:', error);
@@ -165,7 +149,6 @@ export class GrupoDAO {
             }
 
             const responseData = await response.json();
-            console.log('✅ DAO - Respuesta exitosa de invitación individual:', responseData);
 
             return responseData;
         } catch (error) {
@@ -182,17 +165,6 @@ export class GrupoDAO {
             const requestBody = { correos: invitaciones };
             const requestUrl = `${this.apiUrl}/groups/${id_grupo}/invites/batch`;
 
-            console.log('📡 DAO - Enviando invitaciones por lote:', {
-                url: requestUrl,
-                method: 'POST',
-                body: requestBody,
-                totalInvitaciones: invitaciones.length,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token ? 'Token presente' : 'Sin token'}`
-                }
-            });
-
             const response = await fetch(requestUrl, {
                 method: 'POST',
                 headers: {
@@ -202,12 +174,6 @@ export class GrupoDAO {
                 body: JSON.stringify(requestBody)
             });
 
-            console.log('📡 DAO - Respuesta HTTP invitaciones por lote:', {
-                status: response.status,
-                statusText: response.statusText,
-                headers: Object.fromEntries(response.headers.entries())
-            });
-
             if (!response.ok) {
                 const error = await response.json();
                 console.error('❌ DAO - Error en respuesta de invitaciones por lote:', error);
@@ -215,7 +181,6 @@ export class GrupoDAO {
             }
 
             const responseData = await response.json();
-            console.log('✅ DAO - Respuesta exitosa de invitaciones por lote:', responseData);
 
             return responseData;
         } catch (error) {
@@ -348,13 +313,6 @@ export class GrupoDAO {
     // Acepta una invitación usando el token del link
     async aceptarInvitacionPorToken(tokenInvitacion: string, authToken: string): Promise<any> {
         try {
-            console.log('Sending POST request to:', `${this.apiUrl}/groups/invites/accept`);
-            console.log('Headers:', {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            });
-            console.log('Body:', JSON.stringify({ token: tokenInvitacion }));
-            
             const response = await fetch(`${this.apiUrl}/groups/invites/accept`, {
                 method: 'POST',
                 headers: {
@@ -363,9 +321,6 @@ export class GrupoDAO {
                 },
                 body: JSON.stringify({ token: tokenInvitacion })
             });
-
-            console.log('Response status:', response.status);
-            console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
             if (!response.ok) {
                 const error = await response.json();

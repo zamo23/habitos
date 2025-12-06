@@ -103,7 +103,6 @@ self.addEventListener('message', (event) => {
       break;
     case 'SKIP_WAITING':
       self.skipWaiting();
-      console.log('Service Worker: skipWaiting activado');
       break;
   }
 });
@@ -136,12 +135,9 @@ function scheduleNotification(payload) {
     }, timeUntilNotification);
 
     scheduledNotifications.set(tag, timeoutId);
-    
-    console.log(`Notificación programada: ${title} para ${new Date(notifyTime).toLocaleString()}`);
   } else {
     self.registration.showNotification(title, options)
       .then(() => {
-        console.log(`Notificación mostrada inmediatamente: ${title}`);
       })
       .catch(error => {
         console.error(`Error al mostrar notificación inmediata: ${error.message}`);
@@ -157,7 +153,6 @@ function cancelNotifications(tagPrefix) {
     if (tag.startsWith(tagPrefix)) {
       clearTimeout(timeoutId);
       scheduledNotifications.delete(tag);
-      console.log(`Notificación cancelada: ${tag}`);
     }
   }
 }

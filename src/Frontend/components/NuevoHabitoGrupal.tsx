@@ -184,15 +184,7 @@ const NuevoHabitoGrupal: React.FC<NuevoHabitoGrupalProps> = ({
         rol: rolInvitado
       };
 
-      console.log('🚀 Enviando invitación individual:', {
-        grupoId: grupoActual.id,
-        invitacionData,
-        token: token ? 'Token presente' : 'Sin token'
-      });
-
       const response = await grupoControl.invitarUsuario(grupoActual.id, invitacionData, token);
-
-      console.log('✅ Respuesta de invitación individual:', response);
 
       // Agregar el email a la lista de invitaciones enviadas
       setInvitaciones(prev => [...prev, correoInvitado]);
@@ -228,8 +220,6 @@ const NuevoHabitoGrupal: React.FC<NuevoHabitoGrupalProps> = ({
       // Procesar los correos (uno por línea)
       const correos = correosLote.split('\n').map(email => email.trim()).filter(email => email);
 
-      console.log('📝 Correos procesados del lote:', correos);
-
       if (correos.length === 0) {
         throw new Error('No se encontraron correos válidos');
       }
@@ -248,17 +238,7 @@ const NuevoHabitoGrupal: React.FC<NuevoHabitoGrupalProps> = ({
         rol: rolInvitado as 'miembro' | 'administrador'
       }));
 
-      console.log('🚀 Enviando invitaciones por lote:', {
-        grupoId: grupoActual.id,
-        invitaciones,
-        totalCorreos: invitaciones.length,
-        rolAsignado: rolInvitado,
-        token: token ? 'Token presente' : 'Sin token'
-      });
-
       const response = await grupoControl.invitarUsuariosLote(grupoActual.id, invitaciones, token);
-
-      console.log('✅ Respuesta de invitaciones por lote:', response);
 
       // Agregar los emails a la lista de invitaciones enviadas
       setInvitaciones(prev => [...prev, ...correos]);
