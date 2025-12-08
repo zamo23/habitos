@@ -10,6 +10,8 @@ import {
   Heart,
   Loader,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Consejo } from "../hooks/useCoachIA";
 
 interface ConsejoCardProps {
@@ -45,33 +47,39 @@ const etiquetaTipo: Record<Consejo["tipo"], string> = {
   ruptura_racha: "Ruptura de Racha",
 };
 
-// Helper function to render markdown text with bold support
-const renderMarkdownText = (text: string) => {
-  const parts: (string | React.ReactNode)[] = [];
-  const regex = /\*\*(.*?)\*\*/g;
-  let lastIndex = 0;
-  let match;
-
-  while ((match = regex.exec(text)) !== null) {
-    // Add text before the bold part
-    if (match.index > lastIndex) {
-      parts.push(text.substring(lastIndex, match.index));
-    }
-    // Add bold part
-    parts.push(
-      <span key={`bold-${match.index}`} className="font-semibold text-white">
-        {match[1]}
-      </span>
-    );
-    lastIndex = regex.lastIndex;
-  }
-
-  // Add remaining text
-  if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex));
-  }
-
-  return parts.length > 0 ? parts : text;
+const MarkdownRenderer = ({ content }: { content: string }) => {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <p className="text-gray-300 mb-3 leading-relaxed">{children}</p>,
+        h1: ({ children }) => <h1 className="text-xl font-bold text-white mt-4 mb-2">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-lg font-bold text-white mt-3 mb-2">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-base font-semibold text-white mt-3 mb-2">{children}</h3>,
+        ul: ({ children }) => <ul className="list-disc list-inside space-y-2 mb-3 text-gray-300">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 mb-3 text-gray-300">{children}</ol>,
+        li: ({ children }) => (
+          <li className="ml-2 text-gray-300">
+            {children}
+          </li>
+        ),
+        strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+        em: ({ children }) => <em className="italic text-gray-200">{children}</em>,
+        code: ({ children }) => (
+          <code className="bg-gray-800/50 px-2 py-1 rounded text-sm font-mono text-orange-300">
+            {children}
+          </code>
+        ),
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-4 border-blue-400 pl-4 py-2 my-3 text-gray-400 italic">
+            {children}
+          </blockquote>
+        ),
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
 };
 
 const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
@@ -135,38 +143,12 @@ const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
         <div
           ref={contentRef}
           className={`text-sm text-gray-300 transition-all overflow-hidden ${
-            expandido ? "max-h-none" : "max-h-24"
+            expandido ? "max-h-none" : "max-h-64"
           }`}
         >
           <div className="prose prose-invert max-w-none text-sm">
-            {/* Renderizar el contenido como markdown simple */}
-            {consejo.contenido.split("\n").map((linea, i) => {
-              // Detectar títulos (###)
-              if (linea.startsWith("###")) {
-                return (
-                  <h3 key={i} className="font-semibold text-white mt-2 mb-1">
-                    {renderMarkdownText(linea.replace(/^###\s*/, ""))}
-                  </h3>
-                );
-              }
-              // Detectar listas (-)
-              if (linea.startsWith("-")) {
-                return (
-                  <div key={i} className="ml-4 text-gray-300">
-                    • {renderMarkdownText(linea.replace(/^-\s*/, ""))}
-                  </div>
-                );
-              }
-              // Líneas normales
-              if (linea.trim()) {
-                return (
-                  <p key={i} className="text-gray-300 mb-2">
-                    {renderMarkdownText(linea)}
-                  </p>
-                );
-              }
-              return <div key={i} className="h-2" />;
-            })}
+            {/* Renderizar el contenido como markdown completo */}
+            <MarkdownRenderer content={consejo.contenido} />
           </div>
         </div>
 
