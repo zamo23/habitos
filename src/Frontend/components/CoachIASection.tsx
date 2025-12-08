@@ -1,5 +1,5 @@
 import React from "react";
-import { Bot, RotateCw, AlertCircle, Zap } from "lucide-react";
+import { Lightbulb, RotateCw, AlertCircle, Zap } from "lucide-react";
 import { useCoachIA } from "../hooks/useCoachIA";
 import ConsejoCard from "./ConsejoCard";
 
@@ -17,14 +17,30 @@ const CoachIASection: React.FC = () => {
     }
   };
 
+  const SkeletonLoader = () => (
+    <div className="space-y-4">
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="rounded-xl border border-white/10 bg-gray-900/60 p-4 animate-pulse">
+          <div className="h-6 bg-gray-700/50 rounded w-3/4 mb-3"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-700/50 rounded w-full"></div>
+            <div className="h-4 bg-gray-700/50 rounded w-5/6"></div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <div className="h-8 bg-gray-700/50 rounded w-24"></div>
+            <div className="h-8 bg-gray-700/50 rounded w-24"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-blue-600">
-            <Bot className="h-6 w-6 text-white" />
-          </div>
+          <Lightbulb className="h-6 w-6 text-yellow-400" />
           <div>
             <h2 className="text-2xl font-bold text-white">Coach con IA</h2>
             <p className="text-sm text-gray-400">
@@ -33,39 +49,33 @@ const CoachIASection: React.FC = () => {
           </div>
         </div>
 
-        {/* Botón Recargar */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleActualizarConsejos}
-            disabled={loading || actualizando}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm font-semibold text-white transition-colors"
-            title="Generar nuevos consejos"
-          >
-            <Zap className={`h-4 w-4 ${actualizando ? "animate-pulse" : ""}`} />
-            {actualizando ? "Generando..." : "Nuevos Consejos"}
-          </button>
-
-          <button
-            onClick={recargarConsejos}
-            disabled={loading || actualizando}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm font-semibold text-white transition-colors"
-            title="Recargar consejos"
-          >
-            <RotateCw className={`h-4 w-4 ${loading || actualizando ? "animate-spin" : ""}`} />
-            {loading || actualizando ? "Cargando..." : "Recargar"}
-          </button>
-        </div>
       </div>
 
-      {/* Estado de carga */}
-      {loading && !error && (
-        <div className="rounded-2xl border border-white/10 bg-gray-900/60 p-8 flex flex-col items-center justify-center gap-3">
-          <div className="animate-spin">
-            <Bot className="h-8 w-8 text-blue-400" />
-          </div>
-          <p className="text-gray-300">Generando consejos personalizados...</p>
-        </div>
-      )}
+      {/* Botones de Acción */}
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          onClick={handleActualizarConsejos}
+          disabled={loading || actualizando}
+          className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm font-semibold text-white transition-colors"
+          title="Generar nuevos consejos"
+        >
+          <Zap className={`h-4 w-4 ${actualizando ? "animate-pulse" : ""}`} />
+          {actualizando ? "Generando..." : "Nuevo Consejo"}
+        </button>
+
+        <button
+          onClick={recargarConsejos}
+          disabled={loading || actualizando}
+          className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 py-2 text-sm font-semibold text-white transition-colors"
+          title="Recargar consejos"
+        >
+          <RotateCw className={`h-4 w-4 ${loading || actualizando ? "animate-spin" : ""}`} />
+          {loading || actualizando ? "Cargando..." : "Recargar"}
+        </button>
+      </div>
+
+      {/* Estado de carga - Skeleton */}
+      {loading && !error && <SkeletonLoader />}
 
       {/* Mostrar error */}
       {error && (
@@ -93,7 +103,7 @@ const CoachIASection: React.FC = () => {
         </div>
       )}
 
-      {/* Mostrar consejos */}
+      {/* Mostrar consejos con paginación */}
       {!loading && consejos.length > 0 && (
         <>
           {/* Información de la fecha */}
@@ -113,7 +123,7 @@ const CoachIASection: React.FC = () => {
           )}
 
           {/* Grid de consejos */}
-          <div className="grid grid-cols-1 gap-4">
+          <div className="space-y-4">
             {consejos.map((consejo) => (
               <ConsejoCard
                 key={consejo.id}

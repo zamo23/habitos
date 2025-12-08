@@ -9,12 +9,10 @@ import {
   Download,
   Lock,
   Loader2,
-  AlertCircle,
-  AlertTriangle,
+  AlertCircle
 } from "lucide-react";
 import { useSettings } from "../../hooks/useSettings";
 import { useNotifications } from "../../hooks/useNotifications";
-import { areNotificationsSupported } from "../../../serviceWorkerRegistration";
 
 /* ---------- UI helpers ---------- */
 
@@ -180,9 +178,7 @@ const SettingsPage: React.FC = () => {
   const [darkMode, setDarkMode] = React.useState(true);
   
   // Integración de notificaciones
-  const isNotificationsSupported = areNotificationsSupported();
   const {
-    permission: notificationPermission,
     remindersEnabled,
     streakAlertsEnabled,
     toggleReminders,

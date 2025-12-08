@@ -45,10 +45,49 @@ const etiquetaTipo: Record<Consejo["tipo"], string> = {
   ruptura_racha: "Ruptura de Racha",
 };
 
+// Helper function to render markdown text with bold support
+const renderMarkdownText = (text: string) => {
+  const parts: (string | React.ReactNode)[] = [];
+  const regex = /\*\*(.*?)\*\*/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    // Add text before the bold part
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    // Add bold part
+    parts.push(
+      <span key={`bold-${match.index}`} className="font-semibold text-white">
+        {match[1]}
+      </span>
+    );
+    lastIndex = regex.lastIndex;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+};
+
 const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
   const [loading, setLoading] = useState(false);
   const [expandido, setExpandido] = useState(false);
+  const [needsExpand, setNeedsExpand] = useState(false);
+  const contentRef = React.useRef<HTMLDivElement>(null);
   const { icon: Icon, color, bgColor, border } = getIconoYColor(consejo.tipo);
+
+  React.useEffect(() => {
+    if (contentRef.current) {
+      const scrollHeight = contentRef.current.scrollHeight;
+      const clientHeight = contentRef.current.clientHeight;
+      setNeedsExpand(scrollHeight > clientHeight + 10); // 10px de tolerancia
+    }
+  }, [consejo]);
 
   const handleAccion = async (accion: "visto" | "archivado" | "seguido" | "ignorado") => {
     setLoading(true);
@@ -94,6 +133,7 @@ const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
       {/* Contenido */}
       <div className="mt-3">
         <div
+          ref={contentRef}
           className={`text-sm text-gray-300 transition-all overflow-hidden ${
             expandido ? "max-h-none" : "max-h-24"
           }`}
@@ -105,7 +145,7 @@ const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
               if (linea.startsWith("###")) {
                 return (
                   <h3 key={i} className="font-semibold text-white mt-2 mb-1">
-                    {linea.replace(/^###\s*/, "")}
+                    {renderMarkdownText(linea.replace(/^###\s*/, ""))}
                   </h3>
                 );
               }
@@ -113,7 +153,7 @@ const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
               if (linea.startsWith("-")) {
                 return (
                   <div key={i} className="ml-4 text-gray-300">
-                    • {linea.replace(/^-\s*/, "")}
+                    • {renderMarkdownText(linea.replace(/^-\s*/, ""))}
                   </div>
                 );
               }
@@ -121,7 +161,7 @@ const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
               if (linea.trim()) {
                 return (
                   <p key={i} className="text-gray-300 mb-2">
-                    {linea}
+                    {renderMarkdownText(linea)}
                   </p>
                 );
               }
@@ -130,7 +170,7 @@ const ConsejoCard: React.FC<ConsejoCardProps> = ({ consejo, onAccion }) => {
           </div>
         </div>
 
-        {!expandido && consejo.contenido.split("\n").length > 4 && (
+        {!expandido && needsExpand && (
           <button
             onClick={() => setExpandido(true)}
             className="mt-2 text-xs text-blue-400 hover:text-blue-300 font-semibold"

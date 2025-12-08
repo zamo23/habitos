@@ -22,8 +22,20 @@ const StatCard: React.FC<{ label: string; value: string | number }> = ({ label, 
   </div>
 );
 
-const ActivityHeatmapComponent: React.FC = () => {
+const ActivityHeatmapComponent: React.FC<{ hideLoadingState?: boolean }> = ({ hideLoadingState = false }) => {
   const { data, loading, error } = useActivityHeatmap();
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Hacer scroll a la derecha cuando los datos se cargan
+  React.useEffect(() => {
+    if (scrollContainerRef.current && data?.heatmap && !loading) {
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+        }
+      }, 100);
+    }
+  }, [data, loading]);
 
   const { weeks } = useMemo(() => {
     if (!data?.heatmap) return { weeks: [] };
@@ -35,7 +47,7 @@ const ActivityHeatmapComponent: React.FC = () => {
     };
   }, [data]);
 
-  if (loading) {
+  if (loading && !hideLoadingState) {
     return (
       <div className="flex items-center justify-center rounded-lg border border-white/10 bg-white/5 p-8">
         <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
@@ -70,7 +82,10 @@ const ActivityHeatmapComponent: React.FC = () => {
       )}
 
       {/* Heatmap - Estilo GitHub */}
-      <div className="overflow-x-auto rounded-lg border border-white/10 bg-gray-950/40 p-4">
+      <div 
+        ref={scrollContainerRef}
+        className="overflow-x-auto rounded-lg border border-white/10 bg-gray-950/40 p-4"
+      >
         <div className="inline-block min-w-full">
           {/* Encabezados de meses */}
           <div className="mb-3 flex pl-8 text-[10px] font-medium text-gray-500">

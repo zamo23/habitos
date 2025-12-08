@@ -28,15 +28,15 @@ function StatCard({
   sublabel?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-gray-900/60 p-5 shadow-lg backdrop-blur">
-      <div className="flex items-center gap-3 text-gray-300">
-        <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gray-800/60">
-          <Icon className="h-5 w-5" />
+    <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-gray-900/60 p-3 sm:p-5 shadow-lg backdrop-blur">
+      <div className="flex items-center gap-2 sm:gap-3 text-gray-300">
+        <span className="inline-flex h-8 sm:h-10 w-8 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-gray-800/60 flex-shrink-0">
+          <Icon className="h-4 sm:h-5 w-4 sm:w-5" />
         </span>
-        <span className="text-sm">{label}</span>
+        <span className="text-xs sm:text-sm leading-tight">{label}</span>
       </div>
-      <div className="mt-3 text-3xl font-semibold text-white">{value}</div>
-      {sublabel && <div className="mt-1 text-sm text-gray-400">{sublabel}</div>}
+      <div className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-semibold text-white">{value}</div>
+      {sublabel && <div className="mt-1 text-xs sm:text-sm text-gray-400">{sublabel}</div>}
     </div>
   );
 }
@@ -109,55 +109,55 @@ export default function HabitDetailView() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-8">
-        <div className="rounded-2xl border border-white/10 bg-gray-900/40 p-6 backdrop-blur-sm animate-pulse">
+      <div className="w-full px-0 sm:px-4 py-6 sm:py-8 sm:mx-auto sm:max-w-5xl">
+        <div className="rounded-2xl border border-white/10 bg-gray-900/40 p-3 sm:p-6 backdrop-blur-sm animate-pulse">
           {/* Header Skeleton */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div className="h-8 w-24 rounded-lg bg-gray-700"></div>
-              <div className="h-6 w-32 rounded-full bg-gray-700"></div>
+          <div className="mb-6 sm:mb-8">
+            <div className="flex items-center justify-between gap-3">
+              <div className="h-8 w-20 rounded-lg bg-gray-700"></div>
+              <div className="h-6 w-28 rounded-full bg-gray-700"></div>
             </div>
             <div className="mt-4">
-              <div className="h-10 w-2/3 rounded-lg bg-gray-700"></div>
-              <div className="mt-2 h-4 w-1/2 rounded-lg bg-gray-700"></div>
+              <div className="h-8 sm:h-10 w-2/3 rounded-lg bg-gray-700"></div>
+              <div className="mt-2 h-3 sm:h-4 w-1/2 rounded-lg bg-gray-700"></div>
             </div>
           </div>
 
           {/* Stats Skeleton */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-white/10 bg-gray-900/60 p-5 shadow-lg backdrop-blur"
+                className="rounded-xl sm:rounded-2xl border border-white/10 bg-gray-900/60 p-3 sm:p-5 shadow-lg backdrop-blur"
               >
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-gray-700"></div>
-                  <div className="h-4 w-24 rounded-lg bg-gray-700"></div>
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="h-8 sm:h-10 w-8 sm:w-10 rounded-lg sm:rounded-xl bg-gray-700"></div>
+                  <div className="h-3 sm:h-4 w-20 rounded-lg bg-gray-700"></div>
                 </div>
-                <div className="mt-3 h-8 w-16 rounded-lg bg-gray-700"></div>
-                <div className="mt-1 h-4 w-32 rounded-lg bg-gray-700"></div>
+                <div className="mt-2 sm:mt-3 h-6 sm:h-8 w-14 rounded-lg bg-gray-700"></div>
+                <div className="mt-1 h-3 sm:h-4 w-28 rounded-lg bg-gray-700"></div>
               </div>
             ))}
           </div>
 
           {/* Historial Skeleton */}
-          <div className="mt-8">
-            <div className="mb-6">
-              <div className="h-8 w-48 rounded-lg bg-gray-700"></div>
-              <div className="mt-1 h-4 w-96 rounded-lg bg-gray-700"></div>
+          <div className="mt-6 sm:mt-8">
+            <div className="mb-4 sm:mb-6">
+              <div className="h-7 sm:h-8 w-44 rounded-lg bg-gray-700"></div>
+              <div className="mt-1 h-3 sm:h-4 w-80 rounded-lg bg-gray-700"></div>
             </div>
 
-            <div className="divide-y divide-white/5 rounded-2xl border border-white/10 bg-gray-900/60">
+            <div className="divide-y divide-white/5 rounded-xl sm:rounded-2xl border border-white/10 bg-gray-900/60">
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-3 p-3 sm:gap-4 sm:p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <div className="h-8 w-8 rounded-full bg-gray-700"></div>
-                    <div className="h-5 w-32 rounded-lg bg-gray-700"></div>
+                    <div className="h-4 w-28 rounded-lg bg-gray-700"></div>
                   </div>
-                  <div className="h-4 w-48 rounded-lg bg-gray-700"></div>
+                  <div className="h-3 sm:h-4 w-40 rounded-lg bg-gray-700"></div>
                 </div>
               ))}
             </div>
@@ -192,8 +192,8 @@ export default function HabitDetailView() {
 
   return (
     <div className="space-y-6">
-      <div className="mx-auto max-w-5xl px-4 py-8">
-        <div className="rounded-2xl border border-white/10 bg-gray-900/40 p-6 backdrop-blur-sm">
+      <div className="w-full px-0 sm:px-4 py-6 sm:py-8 sm:mx-auto sm:max-w-5xl">
+        <div className="rounded-2xl border border-white/10 bg-gray-900/40 p-3 sm:p-6 backdrop-blur-sm">
           {/* Header (responsive) */}
           <div className="mb-8">
             {/* Fila 1: volver + chips (chips visibles solo en desktop) */}
@@ -259,15 +259,15 @@ export default function HabitDetailView() {
 
             {/* Título + meta */}
             <div className="mt-4">
-              <h1 className="text-3xl font-bold text-white">{habit.titulo}</h1>
-              <p className="mt-2 text-sm text-gray-400">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">{habit.titulo}</h1>
+              <p className="mt-2 text-xs sm:text-sm text-gray-400">
                 Creado hace {habit.dias_desde_creacion} días · {habit.estadisticas.total_registros} registros totales
               </p>
             </div>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               icon={Flame}
               label="Racha Actual"
@@ -295,25 +295,25 @@ export default function HabitDetailView() {
           </div>
 
           {/* Registros recientes */}
-          <div className="mt-8">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold text-white">Historial de Registros</h2>
-              <p className="mt-1 text-sm text-gray-400">
+          <div className="mt-6 sm:mt-8">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-white">Historial de Registros</h2>
+              <p className="mt-1 text-xs sm:text-sm text-gray-400">
                 Primer registro: {`${habit.estadisticas.primer_registro.fecha} ${habit.estadisticas.primer_registro.hora}`} ·
                 {habit.estadisticas.total_exitos} éxitos
               </p>
             </div>
 
-            <div className="divide-y divide-white/5 rounded-2xl border border-white/10 bg-gray-900/60">
+            <div className="divide-y divide-white/5 rounded-xl sm:rounded-2xl border border-white/10 bg-gray-900/60">
               {habit.registros_recientes.length > 0 ? (
                 habit.registros_recientes.map((registro) => (
                   <div
                     key={registro.id}
-                    className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-3 p-3 sm:gap-4 sm:p-4 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <div
-        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full ${
+        className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs sm:text-sm font-medium ${
           registro.estado === "exito"
             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
             : "bg-red-500/10 text-red-400 border border-red-500/20"
@@ -322,25 +322,25 @@ export default function HabitDetailView() {
                         {registro.estado === "exito" ? "✓" : "×"}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-white">
+                        <span className="text-xs sm:text-sm font-medium text-white">
                           {`${registro.fecha} ${registro.hora}`}
                         </span>
                       </div>
                     </div>
                     {registro.comentario && (
-                      <div className="text-sm text-gray-400 sm:text-right sm:max-w-[50%] mt-2 sm:mt-0 pl-11 sm:pl-0">
+                      <div className="text-xs sm:text-sm text-gray-400 sm:text-right sm:max-w-[50%] mt-2 sm:mt-0 pl-10 sm:pl-0">
                         {registro.comentario}
                       </div>
                     )}
                   </div>
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <div className="mb-3 h-12 w-12 rounded-full bg-gray-800/60 flex items-center justify-center">
-                    <Calendar className="h-6 w-6 text-gray-400" />
+                <div className="flex flex-col items-center justify-center py-6 sm:py-8 text-center">
+                  <div className="mb-3 h-10 sm:h-12 w-10 sm:w-12 rounded-full bg-gray-800/60 flex items-center justify-center">
+                    <Calendar className="h-5 sm:h-6 w-5 sm:w-6 text-gray-400" />
                   </div>
-                  <h3 className="text-sm font-medium text-gray-300">Sin registros todavía</h3>
-                  <p className="mt-1 text-sm text-gray-500">Comienza registrando tu progreso diario</p>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-300">Sin registros todavía</h3>
+                  <p className="mt-1 text-xs sm:text-sm text-gray-500">Comienza registrando tu progreso diario</p>
                 </div>
               )}
             </div>
