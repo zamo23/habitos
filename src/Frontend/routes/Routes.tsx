@@ -5,7 +5,6 @@ import { Header } from "../../landing/Header";
 import { Hero } from "../../landing/Hero";
 import { Features } from "../../landing/Features";
 import { About } from "../../landing/About";
-import { CTA } from "../../landing/CTA";
 import { Descargas } from "../../landing/Descargas";
 import { FAQ } from "../../landing/FAQ";
 import { Footer } from "../../landing/Footer";
@@ -57,7 +56,6 @@ const LandingPage = () => {
       <Descargas />
       <About />
       <FAQ />
-      <CTA onRegisterClick={() => setShowRegisterModal(true)} />
       <Footer />
 
       {showLoginModal && <Auth mode="signIn" onClose={() => setShowLoginModal(false)} />}

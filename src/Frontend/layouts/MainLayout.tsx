@@ -56,11 +56,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       {/* TopBar */}
       <nav className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-gray-950/70 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-purple-600">
-              <span className="text-sm font-extrabold">H</span>
-            </div>
-            <span className="text-lg font-bold">Hábitos</span>
+          <div className="flex items-center gap-1">
+            <img src="/favicon.svg" alt="Hábitos" className="w-8 h-8" />
+            <span className="text-lg font-bold">abitos</span>
             {subscription && (
               <span 
                 className={`ml-2 rounded-full border px-2 py-0.5 text-xs ${

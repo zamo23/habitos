@@ -1,4 +1,4 @@
-import { Target, Mail, Github } from "lucide-react";
+import { Mail, Github } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -7,11 +7,9 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Logo + Descripción */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                <Target className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Habitos</span>
+            <div className="flex items-center space-x-1 mb-6">
+              <img src="/favicon.svg" alt="Hábitos" className="w-10 h-10" />
+              <span className="text-2xl font-bold text-white">abitos</span>
             </div>
             <p className="text-gray-300 mb-4 max-w-md leading-relaxed">
               La aplicación que te ayuda a construir hábitos positivos y eliminar los negativos.

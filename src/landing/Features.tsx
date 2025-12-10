@@ -1,8 +1,19 @@
 import { Heart, TrendingUp, Users, X, Shield, Smartphone } from 'lucide-react';
 
+const styles = `
+  .neon-card {
+    transition: all 0.3s ease;
+  }
+  
+  .neon-card:hover {
+    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor !important;
+  }
+`;
+
 export const Features = () => {
   return (
     <section id="features" className="py-24 bg-white dark:bg-gray-900">
+      <style>{styles}</style>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
@@ -19,6 +30,8 @@ export const Features = () => {
             title="Hábitos Positivos"
             description="Crea y mantén hábitos saludables como hacer ejercicio, leer, meditar o cualquier actividad que mejore tu bienestar."
             bgColor="bg-green-100 dark:bg-green-900/30"
+            glowColor="rgba(34, 197, 94, 0.3)"
+            borderColor="#22c55e"
           />
 
           <FeatureCard
@@ -26,6 +39,8 @@ export const Features = () => {
             title="Eliminar Hábitos Negativos"
             description="Rompe con patrones destructivos y adicciones. Nuestra app te ayuda a identificar y eliminar hábitos que te limitan."
             bgColor="bg-red-100 dark:bg-red-900/30"
+            glowColor="rgba(239, 68, 68, 0.3)"
+            borderColor="#ef4444"
           />
 
           <FeatureCard
@@ -33,6 +48,8 @@ export const Features = () => {
             title="Sistema de Rachas"
             description="Mantente activo con nuestro sistema de rachas que aumenta día a día. Cada día completado suma a tu racha, motivándote a seguir adelante."
             bgColor="bg-blue-100 dark:bg-blue-900/30"
+            glowColor="rgba(59, 130, 246, 0.3)"
+            borderColor="#3b82f6"
           />
 
           <FeatureCard
@@ -40,6 +57,8 @@ export const Features = () => {
             title="Hábitos Grupales"
             description="Conecta con amigos y familiares. Los hábitos grupales te permiten motivarte mutuamente y alcanzar metas juntos."
             bgColor="bg-purple-100 dark:bg-purple-900/30"
+            glowColor="rgba(147, 51, 234, 0.3)"
+            borderColor="#9333ea"
             badge="Solo Premium"
           />
 
@@ -48,6 +67,8 @@ export const Features = () => {
             title="Multiplataforma"
             description="Accede desde cualquier dispositivo. Sincronización automática entre tu teléfono, tablet y computadora."
             bgColor="bg-yellow-100 dark:bg-yellow-900/30"
+            glowColor="rgba(202, 138, 4, 0.3)"
+            borderColor="#ca8a04"
           />
 
           <FeatureCard
@@ -55,6 +76,8 @@ export const Features = () => {
             title="Privacidad Garantizada"
             description="Tus datos están seguros. Encriptación end-to-end y políticas estrictas de privacidad para proteger tu información personal."
             bgColor="bg-indigo-100 dark:bg-indigo-900/30"
+            glowColor="rgba(79, 70, 229, 0.3)"
+            borderColor="#4f46e5"
           />
         </div>
       </div>
@@ -67,12 +90,17 @@ interface FeatureCardProps {
   title: string;
   description: string;
   bgColor: string;
+  glowColor: string;
+  borderColor: string;
   badge?: string;
 }
 
-const FeatureCard = ({ icon, title, description, bgColor, badge }: FeatureCardProps) => {
+const FeatureCard = ({ icon, title, description, bgColor, borderColor, badge }: FeatureCardProps) => {
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition-shadow">
+    <div className="neon-card bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 transition-all" style={{
+      border: `2px solid ${borderColor}`,
+      boxShadow: `0 0 10px ${borderColor}40`
+    }}>
       <div className={`w-12 h-12 ${bgColor} rounded-lg flex items-center justify-center mb-6`}>
         {icon}
       </div>

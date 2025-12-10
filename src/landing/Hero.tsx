@@ -14,28 +14,42 @@ export const Hero = ({ onRegisterClick }: HeroProps) => {
             🚀 Premium GRATIS para todos los usuarios
           </div>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-            Transforma tus hábitos,
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 relative">
+            <span className="relative inline-block" style={{
+              textShadow: `
+                0 0 10px rgba(96, 165, 250, 0.8),
+                0 0 20px rgba(96, 165, 250, 0.6),
+                0 0 30px rgba(59, 130, 246, 0.4)
+              `
+            }}>
+              Transforma tus hábitos
+            </span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" style={{
+              textShadow: `
+                0 0 4px rgba(96, 165, 250, 0.3),
+                0 0 8px rgba(96, 165, 250, 0.15)
+              `
+            }}>
               transforma tu vida
             </span>
           </h1>
           
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Crea hábitos positivos y elimina los negativos con HabitFlow. La aplicación diseñada 
+            Crea hábitos positivos y elimina los negativo. La aplicación diseñada 
             para ayudarte a construir la mejor versión de ti mismo, paso a paso.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <button
               onClick={onRegisterClick}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-all transform hover:scale-105 flex items-center"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg transition-all transform hover:scale-105 flex items-center relative"
+              style={{
+                boxShadow: `0 0 15px rgba(59, 130, 246, 0.6), 0 0 25px rgba(96, 165, 250, 0.4), inset 0 0 15px rgba(96, 165, 250, 0.2)`,
+                textShadow: `0 0 8px rgba(96, 165, 250, 0.6)`
+              }}
             >
               Comenzar gratis
               <ArrowRight className="w-5 h-5 ml-2" />
-            </button>
-            <button className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold px-8 py-4 rounded-lg transition-colors border border-gray-300 dark:border-gray-600 hover:border-blue-600 dark:hover:border-blue-400">
-              Ver demo
             </button>
           </div>
 

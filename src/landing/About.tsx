@@ -1,8 +1,19 @@
 import { CheckCircle2 } from "lucide-react";
 
+const styles = `
+  .neon-box {
+    transition: all 0.3s ease;
+  }
+  
+  .neon-box:hover {
+    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor !important;
+  }
+`;
+
 export const About = () => {
   return (
     <section id="about" className="py-24 bg-white dark:bg-gray-900">
+      <style>{styles}</style>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
@@ -22,7 +33,8 @@ export const About = () => {
             </p>
 
             {/* Tarjeta de autor */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
+            <div className="neon-box bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border-2 border-blue-500" style={{boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)'}}>
+
               <div className="flex items-center mb-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mr-4">
                   <span className="text-white font-bold text-lg">LZ</span>
@@ -41,6 +53,7 @@ export const About = () => {
 
           {/* Lista de beneficios */}
           <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8">
+
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
               ¿Por qué Habitos?
             </h3>

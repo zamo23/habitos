@@ -1,4 +1,3 @@
-// src/Frontend/components/StreakAnimation.tsx
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,7 +14,6 @@ const StreakAnimation: React.FC<StreakAnimationProps> = ({
 }) => {
   const [isVisible, setIsVisible] = React.useState(true);
 
-  // Mantener onClose estable dentro del timeout
   const onCloseRef = React.useRef(onClose);
   React.useEffect(() => {
     onCloseRef.current = onClose;
@@ -25,14 +23,12 @@ const StreakAnimation: React.FC<StreakAnimationProps> = ({
     const ANIMATION_DURATION = 5000;
     const timer = setTimeout(() => {
       setIsVisible(false);
-      // Dar tiempo para la animación de salida
       setTimeout(() => onCloseRef.current(), 300);
     }, ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [streak, isFirstTime]); // onClose no es necesario aquí gracias a la ref
+  }, [streak, isFirstTime]);
 
-  // Cerrar con tecla ESC
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -48,6 +44,7 @@ const StreakAnimation: React.FC<StreakAnimationProps> = ({
     <AnimatePresence mode="wait">
       {isVisible && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
+
           {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -76,9 +73,10 @@ const StreakAnimation: React.FC<StreakAnimationProps> = ({
             aria-modal="true"
             aria-label="Animación de racha"
           >
-            <div className="w-80 rounded-3xl bg-gradient-to-b from-orange-500 via-red-500 to-purple-600 p-[2px] shadow-[0_0_40px_rgba(255,90,0,.25)]">
-              <div className="relative rounded-3xl bg-gradient-to-b from-gray-900/95 to-black p-6 text-center">
-                {/* Cinta de nuevo récord */}
+            <div className="w-72 rounded-3xl bg-gradient-to-b from-orange-500 via-red-500 to-purple-600 p-[2px] shadow-[0_0_40px_rgba(255,90,0,.25)]">
+              <div className="relative rounded-3xl bg-gradient-to-b from-gray-900/95 to-black p-5 text-center">
+
+                {/* Cinta nuevo récord */}
                 {isFirstTime && (
                   <motion.div
                     initial={{ opacity: 0, y: -16 }}
@@ -92,99 +90,63 @@ const StreakAnimation: React.FC<StreakAnimationProps> = ({
                   </motion.div>
                 )}
 
-                {/* Mascota: Llama de fuego */}
-                <div className="relative mx-auto h-52 w-52">
-                  {/* Halo de brillo */}
-                  <motion.div
-                    className="absolute inset-0"
-                    animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.08, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    style={{
-                      filter: "blur(18px)",
-                      background:
-                        "radial-gradient(circle at 50% 55%, rgba(255,160,64,.5) 0%, rgba(255,80,0,.25) 30%, rgba(0,0,0,0) 60%)",
-                      borderRadius: "9999px",
-                    }}
-                  />
-
-                  {/* Llama SVG */}
-                  <motion.svg
-                    viewBox="0 0 220 220"
-                    className="relative h-full w-full drop-shadow-[0_0_25px_rgba(255,120,0,.35)]"
-                    initial={{ rotate: 0 }}
-                    animate={{ rotate: [-0.8, 0.8, -0.8] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    {/* ... tu SVG ... */}
-                  </motion.svg>
-
-                  {/* Chispas / partículas */}
-                  {[...Array(12)].map((_, i) => (
-                    <motion.span
-                      key={i}
-                      className="absolute h-1.5 w-1.5 rounded-full"
-                      style={{
-                        left: "50%",
-                        top: "60%",
-                        background:
-                          "radial-gradient(circle, rgba(255,240,170,1) 0%, rgba(255,140,60,1) 60%, rgba(255,140,60,0) 70%)",
-                        filter: "drop-shadow(0 0 8px rgba(255,160,80,.8))",
-                      }}
-                      initial={{ x: 0, y: 0, opacity: 0, scale: 0.8 }}
-                      animate={{
-                        x: (Math.cos(i * 30) * 70) / 2,
-                        y: (Math.sin(i * 30) * -70) / 2 - 20,
-                        opacity: [0, 1, 0],
-                        scale: [0.8, 1.1, 0.6],
-                      }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 2 + (i % 4) * 0.25,
-                        delay: i * 0.1,
-                        ease: "easeOut",
-                      }}
-                    />
-                  ))}
+                {/* Mascota */}
+                <div className="relative mx-auto h-64 w-64 flex items-center justify-center">
+                  <FireCharacter />
                 </div>
 
                 {/* Número de racha */}
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: "spring", damping: 12, stiffness: 220, delay: 0.15 }}
-                  className="relative mt-1"
+                  transition={{
+                    type: "spring",
+                    damping: 12,
+                    stiffness: 220,
+                    delay: 0.15,
+                  }}
+                  className="relative -mt-6"
                 >
+                  {/* Glow */}
                   <motion.span
-                    className="absolute inset-0 bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-6xl font-black tracking-tighter text-transparent blur-lg opacity-70"
+                    className="absolute inset-0 bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-7xl font-black tracking-tighter text-transparent blur-lg opacity-70"
                     initial={{ scale: 1, y: 0 }}
-                    animate={{ 
-                      scale: [1, 1.1, 1],
-                      y: [0, -10, 0]
+                    animate={{
+                      scale: [1, 1.15, 1],
+                      y: [0, -15, 0],
                     }}
-                    transition={{ 
-                      duration: 0.4,
+                    transition={{
+                      duration: 0.5,
                       times: [0, 0.6, 1],
-                      ease: "easeOut"
+                      ease: "easeOut",
+                      repeat: Infinity,
+                      repeatDelay: 2,
                     }}
                   >
                     {streak}
                   </motion.span>
+
+                  {/* Número principal */}
                   <motion.span
-                    className="relative bg-gradient-to-r from-red-500 via-orange-400 to-yellow-300 bg-clip-text text-6xl font-black tracking-tighter text-transparent"
+                    className="relative bg-gradient-to-r from-yellow-200 via-orange-400 to-red-500 bg-clip-text text-7xl font-black tracking-tighter text-transparent"
                     initial={{ scale: 0.8, y: 20 }}
-                    animate={{ 
+                    animate={{
                       scale: 1,
                       y: 0,
                       textShadow: [
-                        "0 0 18px rgba(255,120,0,0.45)",
-                        "0 0 32px rgba(255,120,0,0.75)",
-                        "0 0 18px rgba(255,120,0,0.45)",
+                        "0 0 20px rgba(255,120,0,0.5)",
+                        "0 0 40px rgba(255,100,0,0.8)",
+                        "0 0 20px rgba(255,120,0,0.5)",
                       ],
                     }}
-                    transition={{ 
+                    transition={{
                       scale: { duration: 0.4, ease: "easeOut" },
                       y: { duration: 0.4, ease: "easeOut" },
-                      textShadow: { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
+                      textShadow: {
+                        duration: 2.2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
                     }}
                   >
                     {streak}
@@ -195,41 +157,51 @@ const StreakAnimation: React.FC<StreakAnimationProps> = ({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.35 }}
-                  className="mt-1 text-lg font-medium"
+                  className="-mt-1 text-xl font-bold"
                 >
-                  <span className="bg-gradient-to-r from-orange-200 to-yellow-100 bg-clip-text text-transparent">
-                    {streak === 1 ? "día seguido" : "días seguidos"}
+                  <span className="bg-gradient-to-r from-yellow-300 via-orange-300 to-red-400 bg-clip-text text-transparent">
+                    {streak === 1 ? "¡día seguido!" : "¡días seguidos!"}
                   </span>
                 </motion.div>
 
-                {/* Mini "corona" según racha (máx 7) */}
+                {/* Corona de fuego */}
                 {streak > 1 && (
                   <motion.div
-                    initial={{ opacity: 0, y: -6 }}
+                    initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.45 }}
-                    className="mt-3 flex items-center justify-center gap-1"
+                    className="mt-4 flex items-center justify-center gap-2"
                   >
+                    <span className="text-sm font-bold text-orange-300">🔥</span>
+
                     {Array.from({ length: Math.min(streak, 7) }).map((_, i) => (
-                      <motion.span
+                      <motion.div
                         key={i}
-                        className="h-3 w-2 rounded-full"
+                        className="h-4 w-3 rounded-full"
                         style={{
                           background:
-                            "linear-gradient(180deg, #FFD166 0%, #FF7A3D 60%, #E63946 100%)",
+                            "linear-gradient(180deg, #FFE64D 0%, #FFB74D 30%, #FF7043 70%, #D32F2F 100%)",
+                          boxShadow: "0 0 12px rgba(255,100,0,0.6)",
                         }}
                         animate={{
-                          height: ["12px", "16px", "12px"],
+                          height: ["16px", "20px", "16px"],
                           opacity: [0.8, 1, 0.8],
+                          filter: [
+                            "drop-shadow(0 0 6px rgba(255,120,0,0.5))",
+                            "drop-shadow(0 0 12px rgba(255,100,0,0.8))",
+                            "drop-shadow(0 0 6px rgba(255,120,0,0.5))",
+                          ],
                         }}
                         transition={{
-                          duration: 0.9,
+                          duration: 1,
                           repeat: Infinity,
-                          delay: i * 0.08,
+                          delay: i * 0.1,
                           ease: "easeInOut",
                         }}
                       />
                     ))}
+
+                    <span className="text-sm font-bold text-orange-300">🔥</span>
                   </motion.div>
                 )}
               </div>
@@ -242,3 +214,91 @@ const StreakAnimation: React.FC<StreakAnimationProps> = ({
 };
 
 export default StreakAnimation;
+
+/* -----------------------------------------------------------
+   🔥 PERSONAJE COMPLETO — FireCharacter
+----------------------------------------------------------- */
+const FireCharacter: React.FC = () => {
+  return (
+    <motion.svg
+      viewBox="0 0 200 240"
+      className="h-64 w-64"
+      preserveAspectRatio="xMidYMid meet"
+      animate={{
+        y: [0, -6, 0],
+        rotate: [-1, 1, -1],
+      }}
+      transition={{
+        duration: 3,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      <defs>
+        <linearGradient id="flamGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style={{ stopColor: "#FFD700", stopOpacity: 1 }} />
+          <stop offset="40%" style={{ stopColor: "#FFA500", stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: "#FF6B35", stopOpacity: 1 }} />
+        </linearGradient>
+      </defs>
+
+      {/* CUERPO */}
+      <path
+        d="M 100 50 Q 80 30, 75 5 L 85 45 Q 70 35, 65 15 Q 50 50, 55 100 Q 60 140, 85 150 Q 100 155, 100 155 Q 100 155, 115 150 Q 140 140, 145 100 Q 150 50, 135 15 Q 130 35, 115 45 L 125 5 Q 120 30, 100 50 Z"
+        fill="url(#flamGradient)"
+        filter="drop-shadow(0 0 20px rgba(255, 100, 0, 0.6))"
+      />
+
+      {/* OJOS */}
+      <circle cx="85" cy="85" r="8" fill="white" />
+      <circle cx="115" cy="85" r="8" fill="white" />
+      <circle cx="85" cy="87" r="5" fill="#1a1a1a" />
+      <circle cx="115" cy="87" r="5" fill="#1a1a1a" />
+      <circle cx="87" cy="85" r="2.5" fill="white" />
+      <circle cx="117" cy="85" r="2.5" fill="white" />
+
+      {/* BOCA */}
+      <path
+        d="M 80 110 Q 100 120, 120 110"
+        stroke="#1a1a1a"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+
+      {/* CHISPAS */}
+      <motion.circle
+        cx={140}
+        cy={40}
+        r="3"
+        fill="#FFD700"
+        animate={{ opacity: [0.3, 1, 0.3], y: [0, -10, 0] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      />
+      <motion.circle
+        cx={60}
+        cy={40}
+        r="3"
+        fill="#FFD700"
+        animate={{ opacity: [0.3, 1, 0.3], y: [0, -10, 0] }}
+        transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+      />
+      <motion.circle
+        cx={155}
+        cy={115}
+        r="3"
+        fill="#FFA500"
+        animate={{ opacity: [0.3, 1, 0.3], x: [0, 10, 0] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      />
+      <motion.circle
+        cx={45}
+        cy={115}
+        r="3"
+        fill="#FFA500"
+        animate={{ opacity: [0.3, 1, 0.3], x: [0, -10, 0] }}
+        transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+      />
+    </motion.svg>
+  );
+};

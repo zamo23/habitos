@@ -1,6 +1,16 @@
 import { ChevronDown, Search } from "lucide-react";
 import { useState, useMemo } from "react";
 
+const styles = `
+  .neon-faq {
+    transition: all 0.3s ease;
+  }
+  
+  .neon-faq:hover {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 30px rgba(59, 130, 246, 0.3) !important;
+  }
+`;
+
 interface FAQItem {
   question: string;
   answer: string;
@@ -70,6 +80,7 @@ export const FAQ = () => {
 
   return (
     <section id="faq" className="py-24 bg-white dark:bg-gray-900">
+      <style>{styles}</style>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Preguntas Frecuentes</h2>
@@ -146,6 +157,7 @@ export const FAQ = () => {
         {/* Sección de contacto */}
         {filteredItems.length > 0 && (
           <div className="mt-16 p-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl border border-blue-200 dark:border-blue-900/30">
+
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               ¿No encontraste lo que buscas?
             </h3>
