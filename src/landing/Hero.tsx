@@ -35,8 +35,8 @@ export const Hero = ({ onRegisterClick }: HeroProps) => {
           </h1>
           
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Crea hábitos positivos y elimina los negativo. La aplicación diseñada 
-            para ayudarte a construir la mejor versión de ti mismo, paso a paso.
+            Crea hábitos positivos y elimina los negativos. La aplicación diseñada 
+            para ayudarte a construir la mejor versión de ti mismo, con consejos personalizados con IA, paso a paso.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">

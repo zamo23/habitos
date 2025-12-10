@@ -1,4 +1,4 @@
-import { Heart, TrendingUp, Users, X, Shield, Smartphone } from 'lucide-react';
+import { Heart, TrendingUp, Users, X, Shield, Smartphone, Sparkles, Gift } from 'lucide-react';
 
 const styles = `
   .neon-card {
@@ -7,6 +7,15 @@ const styles = `
   
   .neon-card:hover {
     box-shadow: 0 0 20px currentColor, 0 0 30px currentColor, 0 0 40px currentColor !important;
+  }
+
+  .neon-icon {
+    filter: brightness(1.3) saturate(1.2);
+    transition: all 0.3s ease;
+  }
+
+  .neon-card:hover .neon-icon {
+    filter: brightness(1.6) saturate(1.4);
   }
 `;
 
@@ -24,7 +33,7 @@ export const Features = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FeatureCard
             icon={<Heart className="w-6 h-6 text-green-600 dark:text-green-400" />}
             title="Hábitos Positivos"
@@ -72,6 +81,24 @@ export const Features = () => {
           />
 
           <FeatureCard
+            icon={<Sparkles className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />}
+            title="Consejos con IA"
+            description="Recibe recomendaciones personalizadas basadas en inteligencia artificial. Consejos adaptativos que mejoran con tu progreso."
+            bgColor="bg-cyan-100 dark:bg-cyan-900/30"
+            glowColor="rgba(34, 211, 238, 0.3)"
+            borderColor="#22d3ee"
+          />
+
+          <FeatureCard
+            icon={<Gift className="w-6 h-6 text-pink-600 dark:text-pink-400" />}
+            title="Gratis y sin Anuncios"
+            description="Acceso completo a todas las características sin costo. Disfruta de una experiencia limpia sin interrupciones ni publicidad invasiva."
+            bgColor="bg-pink-100 dark:bg-pink-900/30"
+            glowColor="rgba(236, 72, 153, 0.3)"
+            borderColor="#ec4899"
+          />
+
+          <FeatureCard
             icon={<Shield className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />}
             title="Privacidad Garantizada"
             description="Tus datos están seguros. Encriptación end-to-end y políticas estrictas de privacidad para proteger tu información personal."
@@ -102,7 +129,9 @@ const FeatureCard = ({ icon, title, description, bgColor, borderColor, badge }: 
       boxShadow: `0 0 10px ${borderColor}40`
     }}>
       <div className={`w-12 h-12 ${bgColor} rounded-lg flex items-center justify-center mb-6`}>
-        {icon}
+        <span className="neon-icon">
+          {icon}
+        </span>
       </div>
       <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
         {title}
